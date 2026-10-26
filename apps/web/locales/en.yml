@@ -3761,3 +3761,27 @@ tools:
       bimi: BIMI record (brand logo)
       dane: DANE / TLSA for the MX hosts
       fcrdns: 'Reverse DNS of {host} confirms forward (FCrDNS)'
+  provider-status:
+    title: Provider status
+    description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.
+    intro: Counts are kept in memory since the api container started; cached answers do not reach the provider.
+    refresh: Refresh
+    since: 'Since {time}'
+    set: set
+    optional: optional, not set
+    missing: not set
+    keyless: no key needed
+    states:
+      ok: Working
+      failing: Last call failed
+      no-key: Key missing
+      unused: Not used yet
+    columns:
+      name: Provider
+      state: State
+      key: API key
+      requests: Requests
+      cache: From cache
+      errors: Errors
+      lastOk: Last success
+      problem: Last problem

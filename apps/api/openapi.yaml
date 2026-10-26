@@ -2154,6 +2154,25 @@ paths:
           content:
             text/event-stream:
               schema: { type: string }
+  /v1/providers/status:
+    get:
+      operationId: providersStatus
+      summary: "Public providers — key configured (never the key), requests, cache, errors and last problem since start"
+      tags: [system]
+      x-capability: sys.providers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/ProviderStatus" }
+        default: { $ref: "#/components/responses/Error" }
 components:
   parameters:
     Family:
@@ -4592,3 +4611,25 @@ components:
               city: { type: string }
               country: { type: string }
               facId: { type: integer }
+    ProviderStatus:
+      type: object
+      required: [since, providers]
+      properties:
+        since: { type: string, format: date-time }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [name, secret, keyConfigured, keyOptional, requests, fetches, errors, lastOk, lastError, lastProblem, lastLatencyMs]
+            properties:
+              name: { type: string }
+              secret: { type: string, description: name of the environment variable (never its value) }
+              keyConfigured: { type: boolean }
+              keyOptional: { type: boolean }
+              requests: { type: integer }
+              fetches: { type: integer }
+              errors: { type: integer }
+              lastOk: { type: [string, "null"], format: date-time }
+              lastError: { type: [string, "null"], format: date-time }
+              lastProblem: { type: string }
+              lastLatencyMs: { type: integer }

@@ -54,6 +54,8 @@ type Options struct {
 	Exec    *execx.Runner
 	Limiter *limits.RateLimiter
 	Pool    *limits.Pool
+	// Providers defaults to a new client (tests pass one to inspect it).
+	Providers *providers.Client
 }
 
 // BuildDeps fills defaults and returns the dependencies handed to tools.
@@ -77,8 +79,11 @@ func BuildDeps(o *Options) tools.Deps {
 	}
 	limiter := o.Limiter
 	ua := "NetTools/" + o.Build.Version + " (+" + cfg.PublicURL + ")"
+	if o.Providers == nil {
+		o.Providers = providers.New(o.Target, ua)
+	}
 	return tools.Deps{
-		Providers: providers.New(o.Target, ua),
+		Providers: o.Providers,
 		Config:    cfg,
 		Logger:    o.Logger,
 		Target:    o.Target,

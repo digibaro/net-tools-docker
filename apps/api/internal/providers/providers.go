@@ -32,6 +32,7 @@ const DefaultTTL = 10 * time.Minute
 type Client struct {
 	HTTP  *http.Client
 	cache *cache.TTL[[]byte]
+	stats stats
 }
 
 // New builds a client whose dials go through res.
@@ -135,7 +136,13 @@ func (c *Client) Get(ctx context.Context, r Request) ([]byte, error) {
 	if key == "" {
 		key = r.URL
 	}
-	fetch := func(ctx context.Context) ([]byte, error) { return c.fetch(ctx, r) }
+	c.stats.request(r.Provider)
+	fetch := func(ctx context.Context) ([]byte, error) {
+		start := time.Now()
+		b, err := c.fetch(ctx, r)
+		c.stats.fetched(r.Provider, time.Since(start), err)
+		return b, err
+	}
 	if r.TTL < 0 || (r.Method != "" && r.Method != http.MethodGet) {
 		return fetch(ctx)
 	}

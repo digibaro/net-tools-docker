@@ -3761,3 +3761,27 @@ tools:
       bimi: BIMI-record (merklogo)
       dane: DANE / TLSA voor de MX-hosts
       fcrdns: 'Reverse DNS van {host} bevestigt forward (FCrDNS)'
+  provider-status:
+    title: Providerstatus
+    description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.
+    intro: De tellingen staan in het geheugen sinds de api-container startte; antwoorden uit de cache bereiken de provider niet.
+    refresh: Vernieuwen
+    since: 'Sinds {time}'
+    set: ingesteld
+    optional: optioneel, niet ingesteld
+    missing: niet ingesteld
+    keyless: geen sleutel nodig
+    states:
+      ok: Werkt
+      failing: Laatste aanroep mislukt
+      no-key: Sleutel ontbreekt
+      unused: Nog niet gebruikt
+    columns:
+      name: Provider
+      state: Status
+      key: API-sleutel
+      requests: Requests
+      cache: Uit cache
+      errors: Fouten
+      lastOk: Laatste succes
+      problem: Laatste probleem
