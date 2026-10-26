@@ -1,6 +1,6 @@
 # NET-TOOLS
 
-Self-hosted network tools and troubleshooting utilities in one web app — 151 tools for IP
+Self-hosted network tools and troubleshooting utilities in one web app — 168 tools for IP
 addressing, DNS, connectivity, HTTP, TLS, email, BGP, reputation and your LAN. The UX follows
 [it-tools](https://github.com/CorentinTh/it-tools): a searchable grid of tools, each on its own
 page, light / dark / auto theme, shareable links. Ships as two Docker containers.
