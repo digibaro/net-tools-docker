@@ -145,7 +145,7 @@ export async function generateLab(o: LabOptions, existing?: ExistingCA): Promise
     subject: `CN=${rdn(o.serverName)}`,
     issuer: ca.subject,
     notBefore,
-    notAfter: new Date(Math.min(days(o.serverDays).getTime(), existing ? ca.notAfter.getTime() : days(o.caDays).getTime())),
+    notAfter: new Date(Math.min(days(o.serverDays).getTime(), ca.notAfter.getTime())), // never outlive the CA
     signingAlgorithm: sign,
     publicKey: srvKeys.publicKey,
     signingKey: caPrivate,
