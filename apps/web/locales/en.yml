@@ -164,6 +164,9 @@ ping:
   interval: Interval (ms)
   run: Start
 report:
+  add: Add to report
+  added: Added to the report (see Report bundle).
+  full: The report could not be saved (browser storage full).
   score: 'Score {score}/100 — {fail} problem(s), {warn} warning(s)'
   status:
     pass: OK
@@ -3790,3 +3793,18 @@ tools:
       errors: Errors
       lastOk: Last success
       problem: Last problem
+  report-bundle:
+    title: Report bundle
+    description: Collect result tables from several tools into one report, then print it or download it as Markdown or JSON for a ticket or change record.
+    intro: Use "Add to report" under any result table. The report is kept in this browser only (at most 30 items, 500 rows each).
+    heading: NET-TOOLS report
+    markdown: Download Markdown
+    json: Download JSON
+    print: Print / PDF
+    clear: Clear report
+    confirmClear: Remove all items from the report?
+    empty: The report is empty. Use "Add to report" under a result table.
+    truncated: (first 500 rows)
+    up: Move up
+    down: Move down
+    remove: Remove from report

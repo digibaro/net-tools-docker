@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { DataTableColumns } from 'naive-ui'
-import { TableExport } from '@vicons/tabler'
-import { NA, NButton, NDataTable, NIcon } from 'naive-ui'
+import { FilePlus, TableExport } from '@vicons/tabler'
+import { NA, NButton, NDataTable, NIcon, useMessage } from 'naive-ui'
 import { computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
+import { addToReport } from '@/composables/report'
 import { csvName, toCsv } from '@/utils/csv'
 import { downloadText } from '@/utils/download'
 import ResultActions from './ResultActions.vue'
@@ -34,7 +35,9 @@ const props = withDefaults(defineProps<{
   /** Accessible name of the scrollable region. */
   label?: string
   rowKey?: string
-}>(), { filename: 'result.json', actions: true })
+  /** Offer "add to report" (off on the report page itself). */
+  reportable?: boolean
+}>(), { filename: 'result.json', actions: true, reportable: true })
 
 const { t } = useI18n()
 const data = computed(() => props.rows as Row[])
@@ -73,6 +76,15 @@ function downloadCsv() {
   downloadText(csvName(props.filename), toCsv(props.columns.map(c => c.title), rows), 'text/csv;charset=utf-8')
 }
 
+const message = useMessage()
+function report() {
+  const ok = addToReport({ path: window.location.pathname, search: window.location.search, label: props.label ?? '', columns: props.columns, rows: props.rows })
+  if (ok)
+    message.success(t('report.added'))
+  else
+    message.error(t('report.full'))
+}
+
 function asText(): string {
   const header = props.columns.map(c => c.title).join('\t')
   const lines = data.value.map(r => props.columns.map(c => String(r[c.key] ?? '')).join('\t'))
@@ -107,6 +119,12 @@ function asText(): string {
           <NIcon aria-hidden="true" :component="TableExport" />
         </template>
         {{ t('common.downloadCsv') }}
+      </NButton>
+      <NButton v-if="reportable" size="small" secondary data-testid="add-to-report" @click="report">
+        <template #icon>
+          <NIcon aria-hidden="true" :component="FilePlus" />
+        </template>
+        {{ t('report.add') }}
       </NButton>
     </div>
   </div>

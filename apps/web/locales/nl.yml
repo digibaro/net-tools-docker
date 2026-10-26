@@ -164,6 +164,9 @@ ping:
   interval: Interval (ms)
   run: Starten
 report:
+  add: Aan rapport toevoegen
+  added: Toegevoegd aan het rapport (zie Rapportbundel).
+  full: Het rapport kon niet worden opgeslagen (browseropslag vol).
   score: 'Score {score}/100 — {fail} probleem/problemen, {warn} waarschuwing(en)'
   status:
     pass: OK
@@ -3790,3 +3793,18 @@ tools:
       errors: Fouten
       lastOk: Laatste succes
       problem: Laatste probleem
+  report-bundle:
+    title: Rapportbundel
+    description: Verzamel resultaattabellen van meerdere tools in één rapport en print het, of download het als Markdown of JSON voor een ticket of wijzigingsrecord.
+    intro: Gebruik "Aan rapport toevoegen" onder een resultaattabel. Het rapport blijft alleen in deze browser (maximaal 30 items, 500 rijen per item).
+    heading: NET-TOOLS-rapport
+    markdown: Markdown downloaden
+    json: JSON downloaden
+    print: Printen / PDF
+    clear: Rapport wissen
+    confirmClear: Alle items uit het rapport verwijderen?
+    empty: Het rapport is leeg. Gebruik "Aan rapport toevoegen" onder een resultaattabel.
+    truncated: (eerste 500 rijen)
+    up: Omhoog
+    down: Omlaag
+    remove: Uit rapport verwijderen
