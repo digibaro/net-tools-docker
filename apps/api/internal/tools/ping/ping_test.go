@@ -2,6 +2,8 @@ package ping
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"net/netip"
 	"strings"
 	"testing"
@@ -74,5 +76,73 @@ func TestPingSSRF(t *testing.T) {
 		if !strings.Contains(body, `"code":"`+code+`"`) || strings.Contains(body, "event: reply") {
 			t.Errorf("%s: %s", target, body)
 		}
+	}
+}
+
+func TestMonitor(t *testing.T) {
+	var gotCount int
+	var gotInterval time.Duration
+	engine := func(_ context.Context, _ netip.Addr, interval time.Duration, count int, onSent func(Sent), onReply func(Reply, time.Duration)) error {
+		gotCount, gotInterval = count, interval
+		for i := range 4 {
+			onSent(Sent{Seq: i})
+			if i != 2 {
+				onReply(Reply{Seq: i, RTTMs: 10}, 10*time.Millisecond)
+			}
+		}
+		return nil
+	}
+	env := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("93.184.215.14"), Env: map[string]string{"MONITOR_MAX_MINUTES": "10"}})
+	body := env.Get("/api/v1/ping/monitor/stream?target=example.com&minutes=2&interval=2").Raw.Body.String()
+	if strings.Count(body, "event: sent") != 4 || strings.Count(body, "event: reply") != 3 || !strings.Contains(body, `"lossPct":25`) || gotCount != 60 || gotInterval != 2*time.Second {
+		t.Fatalf("count=%d interval=%s body=%s", gotCount, gotInterval, body)
+	}
+	if b := env.Get("/api/v1/ping/monitor/stream?target=example.com&minutes=11").Raw.Body.String(); !strings.Contains(b, `"code":"INVALID_INPUT"`) {
+		t.Errorf("over limit: %s", b)
+	}
+}
+
+func TestMonitorSSRF(t *testing.T) {
+	engine := func(context.Context, netip.Addr, time.Duration, int, func(Sent), func(Reply, time.Duration)) error {
+		t.Error("engine called for a refused target")
+		return nil
+	}
+	// internal.example resolves to 10.0.0.5: a public-looking name pointing inside (DNS rebinding).
+	env := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("10.0.0.5")})
+	for target, code := range map[string]string{
+		"127.0.0.1":          "TARGET_PRIVATE_DENIED",
+		"::1":                "TARGET_PRIVATE_DENIED",
+		"10.1.1.1":           "TARGET_PRIVATE_DENIED",
+		"fe80::1":            "TARGET_PRIVATE_DENIED",
+		"169.254.169.254":    "TARGET_BLOCKED",
+		"::ffff:192.168.0.1": "TARGET_PRIVATE_DENIED",
+		"0x7f.1":             "INVALID_INPUT",
+		"2130706433":         "INVALID_INPUT",
+		"internal.example":   "TARGET_PRIVATE_DENIED",
+		"224.0.0.1":          "TARGET_BLOCKED",
+	} {
+		body := env.Get("/api/v1/ping/monitor/stream?target=" + target).Raw.Body.String()
+		if !strings.Contains(body, `"code":"`+code+`"`) || strings.Contains(body, "event: sent") {
+			t.Errorf("%s: %s", target, body)
+		}
+	}
+}
+
+// Over the limit, a stream request gets the error as an SSE event (EventSource cannot read a 429
+// body) and a JSON request the usual envelope; both carry retryAfter.
+func TestRateLimitedStream(t *testing.T) {
+	engine, _, _ := fake(nil)
+	env := tooltest.New(t, &Tool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("93.184.215.14"), Env: map[string]string{"RATE_LIMIT_HEAVY_RPM": "6"}})
+	var last *httptest.ResponseRecorder
+	for range 4 {
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/v1/ping/stream?target=example.com&count=1", nil)
+		req.Header.Set("Accept", "text/event-stream")
+		last = env.Do(req).Raw
+	}
+	if last.Code != http.StatusOK || !strings.Contains(last.Body.String(), "event: error") || !strings.Contains(last.Body.String(), `"code":"RATE_LIMITED"`) || !strings.Contains(last.Body.String(), `"retryAfter":`) {
+		t.Fatalf("sse: %d %s", last.Code, last.Body.String())
+	}
+	if r := env.Get("/api/v1/ping/stream?target=example.com"); r.Status != http.StatusTooManyRequests || r.Raw.Header().Get("X-RateLimit-Remaining") != "0" {
+		t.Errorf("json: %d %s", r.Status, r.Raw.Body.String())
 	}
 }

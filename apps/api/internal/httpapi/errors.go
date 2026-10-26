@@ -26,6 +26,8 @@ const (
 	CodeInternal            Code = "INTERNAL"
 	CodeNotFound            Code = "NOT_FOUND"
 	CodeMethodNotAllowed    Code = "METHOD_NOT_ALLOWED"
+	CodeUnauthenticated     Code = "UNAUTHENTICATED"
+	CodeForbidden           Code = "FORBIDDEN"
 )
 
 var codeStatus = map[Code]int{
@@ -42,6 +44,8 @@ var codeStatus = map[Code]int{
 	CodeInternal:            http.StatusInternalServerError,
 	CodeNotFound:            http.StatusNotFound,
 	CodeMethodNotAllowed:    http.StatusMethodNotAllowed,
+	CodeUnauthenticated:     http.StatusUnauthorized,
+	CodeForbidden:           http.StatusForbidden,
 }
 
 // Status returns the HTTP status for a code (500 for unknown codes).

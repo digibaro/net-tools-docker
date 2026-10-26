@@ -45,6 +45,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | IP-21 | IP address plan (IPAM sheet) | IPv4/IPv6 plan with names, VLANs, fixed networks, first-fit allocation, free blocks, CSV | B | custom | — | 6 | ✅ |
 | IP-22 | NAT64 / DNS64 check | DNS64 detection and NAT64 prefix discovery via ipv4only.arpa (RFC 7050 / 6052) | S | `miekg/dns` | — | 6 | ✅ |
 | IP-23 | Country IP blocks | IPv4/IPv6 blocks registered to a country, merged; prefix-list / ipset / address-list output | S | `netipx` | RIPEstat country-resource-list | 6 | ✅ |
+| IP-24 | Subnet overlap checker | Overlapping / duplicate prefixes between labelled groups (IPv4 / IPv6) | B | custom | — | 7 | ✅ |
 
 ## 2. DNS
 
@@ -68,6 +69,9 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | DNS-16 | Reverse DNS coverage | PTR + forward confirmation (FCrDNS) for a /24 or /120 | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-17 | HTTPS / SVCB & ECH viewer | RFC 9460 records, alias chasing, ECHConfigList decoding, DDR | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-18 | EDNS compliance test | ISC ednscomp-style tests per authoritative server | S | `miekg/dns` | — | 6 | ✅ |
+| DNS-19 | DNS migration / TTL planner | Lower / change / restore timeline from the current TTL, iCalendar export | H | `/api/v1/dns/lookup` (optional) | — | 7 | ✅ |
+| DNS-20 | DNS health report | NS count / spread / lameness, serials, SOA timers, DNSSEC, EDNS, CAA, MX — graded | S | composed from DNS tools | — | 7 | ✅ |
+| DNS-21 | Bulk lookup | DNS / reverse DNS / IP-to-ASN / TCP port check for up to 100 targets, paced to the rate limit (waits on `retryAfter`) | S | existing lookup endpoints | — | 7 | ✅ |
 
 ## 3. Connectivity & Diagnostics
 
@@ -81,13 +85,14 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CON-06 | Port scanner | Bounded TCP connect scan (≤ `MAX_PORTS`), common-ports presets | S | Go worker pool; optional `nmap -sT` | Shodan InternetDB (passive) | 4 | ✅ |
 | CON-07 | Path MTU discovery | Find max non-fragmented packet size to target | S | `pro-bing` with DF + size bisection | — | 3 | ✅ |
 | CON-08 | Bandwidth test (iperf3) | TCP/UDP throughput to an iperf3 server | S | `iperf3 -c … --json` via execx | public iperf3 servers list (user-supplied) | 4 | ✅ |
-| CON-09 | Browser speed test | Download/upload/latency between browser and server | B+S | LibreSpeed container (`speedtest` profile) | Cloudflare speed test endpoints | 3 | ✅ |
+| CON-09 | Browser speed test | Download/upload/latency between browser and server, bufferbloat grade (latency under load) | B+S | LibreSpeed container (`speedtest` profile) | Cloudflare speed test endpoints | 3 | ✅ |
 | CON-10 | Global ping / "is it down" | Ping/HTTP from many countries, map view | P | — | Globalping API, check-host.net | 3 | ✅ |
 | CON-11 | NTP check | Query NTP server: offset, stratum, delay, refid | S | `github.com/beevik/ntp` | — | 2 | ✅ |
 | CON-12 | SNMP get / walk | v2c/v3 get/walk of an OID subtree (bounded) | S | `gosnmp` | — | 4 | ✅ |
 | CON-13 | Server network info | Interfaces, addresses, routes, resolvers, gateway of the api container/host | S | `net.Interfaces`, `/proc/net/route` | — | 2 | ✅ |
 | CON-14 | IPv6 readiness | Does target have AAAA, is it reachable over v6 from server | S | DNS + dial | Globalping | 3 | ✅ |
 | CON-15 | Latency matrix | Ping multiple targets in parallel, compare | S | `pro-bing` fan-out | Globalping | 3 | ✅ |
+| CON-18 | Latency monitor | Smokeping-style ping up to MONITOR_MAX_MINUTES, per-minute loss / latency / jitter | S | `pro-bing` | — | 7 | ✅ |
 
 ## 4. HTTP & Web
 
@@ -147,6 +152,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | EM-08 | DMARC aggregate report viewer | Upload XML/zip/gz report → tables | B | `fflate` + XML parser | — | 4 | ✅ |
 | EM-09 | Open relay test | Opt-in, bounded relay test of own server | S | `net/smtp` (no DATA sent) | — | 4 | ✅ |
 | EM-10 | SMTP banner & FCrDNS | PTR, forward confirmation, banner and EHLO name vs PTR, STARTTLS | S | `miekg/dns`, `net/smtp`-style probe | — | 6 | ✅ |
+| EM-11 | TLS-RPT report viewer | RFC 8460 reports (JSON / gzip): success rate, failures by type and MX | B | `fflate` | — | 7 | ✅ |
+| EM-12 | Email deliverability report | MX/STARTTLS, SPF, DKIM, DMARC, MTA-STS, TLS-RPT, BIMI, DANE, FCrDNS — graded | S | composed from email tools | — | 7 | ✅ |
 
 ## 7. Routing, BGP & Registry
 
@@ -168,6 +175,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | BGP-14 | ASN neighbour graph | Upstreams / downstreams with names as an SVG graph, click to re-centre | P | — | RIPEstat asn-neighbours, as-names | 6 | ✅ |
 | BGP-15 | ROA coverage per ASN | RFC 6811 status of every originated prefix, unused / loose ROAs, minimal ROA suggestions | P | — | RIPEstat ris-prefixes, rpki-roas, rpki-validation | 6 | ✅ |
 | BGP-16 | Common IXPs & facilities | Exchanges and facilities two networks share, port speeds, route-server use | P | — | PeeringDB | 6 | ✅ |
+| BGP-17 | Prefix-list / route-filter tester | Cisco prefix-list (ge/le) and Junos route-filter / prefix-list evaluation per route | B | custom | — | 7 | ✅ |
+| BGP-18 | BGP community decoder | Standard / large / extended communities, well-known values, route-server conventions, hex | B | custom | — | 7 | ✅ |
 
 ## 8. Reputation & Geolocation
 
@@ -213,6 +222,12 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CAL-14 | VoIP bandwidth & Erlang calculator | Per-call bandwidth incl. RTP/UDP/IP/SRTP/VLAN/L2 overhead, Erlang B trunk sizing | B | custom | — | 6 | ✅ |
 | CAL-15 | Packet decoder | Hex dump → Ethernet, VLAN, ARP, IPv4/IPv6, TCP, UDP, ICMP, DNS | B | custom | — | 6 | ✅ |
 | CAL-16 | Pcap viewer | pcap / pcapng in the browser: packets, filter, protocols, conversations, DNS queries | B | custom | — | 6 | ✅ |
+| CAL-17 | PoE budget calculator | Class-based or LLDP allocation per 802.3af/at/bt vs switch budget | B | custom | — | 7 | ✅ |
+| CAL-18 | NAT / PAT capacity calculator | CGNAT port blocks, subscribers per IP, IPs needed, deterministic NAT (RFC 7422) | B | custom | — | 7 | ✅ |
+| CAL-19 | Point-to-point wireless link | FSPL, EIRP, receive level, fade margin, Fresnel clearance, earth bulge | B | custom | — | 7 | ✅ |
+| CAL-20 | DSCP / ToS / CoS converter | DSCP ↔ ToS ↔ precedence ↔ 802.1p, RFC 4594 classes, marking snippets | B | custom | — | 7 | ✅ |
+| CAL-21 | Network config diff | Section-aware, order-insensitive diff for IOS/EOS/NX-OS and Junos, secrets masked | B | custom | — | 7 | ✅ |
+| CAL-22 | ACL / firewall rule analyzer | Shadowed / redundant / wide rules in IOS and ASA ACLs, packet tracer | B | custom | — | 7 | ✅ |
 
 ## 11. Client Diagnostics (runs in the user's browser)
 
@@ -223,6 +238,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CLI-03 | Browser connection info | Network Information API, IPv4/IPv6 reachability, DoH in use? | B | `navigator.connection` + fetch to v4/v6-only endpoints | ipify v4/v6 endpoints | 2 | ✅ |
 | CLI-04 | Request headers echo | Headers the server receives from your browser (proxy detection) | S | `/api/v1/echo` | — | 1 | ✅ |
 | CLI-05 | DNS hijack & proxy check | Server resolver vs public DoH (filtering, NXDOMAIN hijacking); marker header for HTTP proxies | H | `/api/v1/echo`, `/api/v1/dns/lookup` | Cloudflare DoH *(browser-direct)* | 6 | ✅ |
+| CLI-06 | Provider status | Per public provider: key configured (never the key), requests, cache hits, errors, last problem since start | S | `/api/v1/providers/status` | — | 7 | ✅ |
+| CLI-07 | Report bundle | Collect result tables from any tool ("Add to report"), reorder, export Markdown / JSON / print-PDF; kept in the browser | B | `localStorage` | — | 7 | ✅ |
 
 ---
 

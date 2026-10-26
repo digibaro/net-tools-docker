@@ -6,6 +6,30 @@ instructions are on the [GitHub releases page](https://github.com/digibaro/net-t
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-26
+
+### Added
+- 17 new tools (168 in total):
+  - IP: subnet overlap checker.
+  - DNS: DNS health report, DNS TTL change planner, bulk lookup (DNS / PTR / ASN / port check).
+  - Connectivity: latency monitor (`MONITOR_MAX_MINUTES`).
+  - Email: email deliverability report, TLS-RPT report viewer.
+  - BGP: prefix-list tester, BGP community decoder.
+  - Calculators: PoE budget, NAT/PAT capacity, wireless link budget, DSCP / ToS converter, config
+    diff, ACL analyzer.
+  - Client: provider status, report bundle.
+- Tool history with pinning, compare mode (one tool twice side by side), "Add to report" on every
+  result table.
+- Rate-limit feedback: `X-RateLimit-*` headers, retry countdown, remaining-budget hint; stream
+  requests get rate-limit and busy rejections as an SSE `error` event.
+- Speed test: bufferbloat grade.
+- Optional OIDC sign-in (`AUTH_MODE=oidc`) with user and admin roles and signed session cookies;
+  `AUTH_ADMIN_TOOLS`, `AUTH_ANONYMOUS_ROLE`.
+- `docker-compose.proxy.yml`: join the web container to an existing reverse-proxy network.
+
+### Fixed
+- Lab CA generator: the server certificate no longer outlives its CA by a fraction of a second.
+
 ## [0.6.0] - 2026-10-15
 
 ### Added
@@ -88,7 +112,8 @@ Phases 0–3 (foundations, 32 browser tools, DNS / connectivity / HTTP / TLS / e
 tools, providers and Worldwide measurements) were developed before the first release; see the git
 history and `docs/IMPLEMENTATION_PLAN.md`.
 
-[Unreleased]: https://github.com/digibaro/net-tools-docker/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/digibaro/net-tools-docker/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/digibaro/net-tools-docker/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/digibaro/net-tools-docker/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/digibaro/net-tools-docker/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/digibaro/net-tools-docker/releases/tag/v0.4.0

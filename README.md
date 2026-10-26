@@ -1,6 +1,6 @@
 # NET-TOOLS
 
-Self-hosted network tools and troubleshooting utilities in one web app — 151 tools for IP
+Self-hosted network tools and troubleshooting utilities in one web app — 168 tools for IP
 addressing, DNS, connectivity, HTTP, TLS, email, BGP, reputation and your LAN. The UX follows
 [it-tools](https://github.com/CorentinTh/it-tools): a searchable grid of tools, each on its own
 page, light / dark / auto theme, shareable links. Ships as two Docker containers.
@@ -118,6 +118,29 @@ Tools that need a key show "API key missing" until it is set.
 
 URL reputation needs at least one of its three keys; the others are reported as skipped.
 
+### Sign-in (optional)
+
+Off by default. With `AUTH_MODE=oidc` NET-TOOLS signs users in with any OpenID Connect provider
+(Keycloak, Authentik, Entra ID, Google, Authelia…). Register a confidential client with redirect URI
+`<PUBLIC_URL>/api/v1/auth/callback`; the session is a signed cookie, so there is no database.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `AUTH_MODE` | `off` | `oidc` turns sign-in on |
+| `OIDC_ISSUER` | — | Issuer URL (discovery at `/.well-known/openid-configuration`) |
+| `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` | — | Client credentials (`OIDC_CLIENT_SECRET_FILE` works too) |
+| `OIDC_REDIRECT_URL` | `<PUBLIC_URL>/api/v1/auth/callback` | Override when the public URL differs |
+| `OIDC_SCOPES` | `openid profile email` | Add `groups` if your provider needs it |
+| `OIDC_ROLES_CLAIM` | `groups` | Claim with the groups; dotted for nested claims (`realm_access.roles`) |
+| `OIDC_ADMIN_GROUPS` | — | Groups that get the admin role |
+| `OIDC_USER_GROUPS` | — | If set, only these groups (and admins) may sign in |
+| `SESSION_SECRET` | — | Required, ≥ 32 characters (`openssl rand -hex 32`); `SESSION_SECRET_FILE` works too |
+| `SESSION_TTL` | `12h` | How long a sign-in lasts |
+| `AUTH_ANONYMOUS_ROLE` | `none` | `none`: visitors only get browser tools; `user`: sign-in is only needed for admin tools |
+| `AUTH_ADMIN_TOOLS` | `sys.providers` | Capability ids only admins may use (for example `net.portscan,net.snmp,net.iperf`) |
+
+`PUBLIC_URL` must be the address users open (it sets the cookie's `Secure` flag for `https://`).
+
 ### Limits
 
 Rate limits and per-tool bounds keep the server from being abused. The most useful ones:
@@ -129,6 +152,7 @@ Rate limits and per-tool bounds keep the server from being abused. The most usef
 | `CONCURRENCY_PER_IP` / `CONCURRENCY_GLOBAL` | 3 / 32 | Simultaneous heavy requests |
 | `PORTSCAN_MAX_PORTS` / `PORTSCAN_RATE_PPS` | 1024 / 200 | Port scanner bounds |
 | `IPERF_MAX_SECONDS` | 15 | Longest iperf3 test |
+| `MONITOR_MAX_MINUTES` | 30 | Longest latency monitor run |
 
 The complete list with explanations is in [docs/SECURITY.md](docs/SECURITY.md).
 
@@ -195,6 +219,14 @@ Health checks: `GET /api/healthz` (process up) and `GET /api/readyz` (dependenci
 - Theme (light / dark / auto) and language (NL / UK) are switched in the top bar; the accent
   colour is under settings (gear icon).
 - Result tables download as CSV; the printer icon prints a tool or saves it as PDF.
+- Recent inputs show as chips under the tool title (pin the ones you reuse); they stay in your
+  browser.
+- The columns icon opens a tool twice side by side (**compare**: two resolvers, before/after).
+- **Add to report** under any result table collects it in the *Report bundle*, which exports
+  Markdown or JSON or prints one report for a ticket.
+- *Bulk lookup* runs a DNS, PTR, ASN or port check over a list of up to 100 targets; it pauses
+  when the rate limit is reached instead of failing.
+- *Provider status* shows which public-service keys are configured and whether calls work.
 - Worldwide results show the probe locations on a map; select a dot to jump to its result.
 - Server tools run from the server's location; many DNS and connectivity tools can also run
   **Worldwide** through Globalping probes.

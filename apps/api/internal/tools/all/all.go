@@ -48,6 +48,7 @@ import (
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/snmp"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/speedtest"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/sshaudit"
+	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/status"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/svcb"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/tcping"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/tlsinspect"
@@ -61,6 +62,7 @@ import (
 func Tools() []tools.Tool {
 	rdapSvc := &rdap.Service{}
 	return []tools.Tool{
+		&status.Tool{},
 		&dnslookup.Tool{},
 		&dns64.Tool{},
 		&openresolver.Tool{},
@@ -74,6 +76,7 @@ func Tools() []tools.Tool {
 		&dnsconsistency.Tool{},
 		&dnscaa.Tool{},
 		&ping.Tool{},
+		&ping.MonitorTool{},
 		&tcping.Tool{},
 		&mtr.Tool{Mode: mtr.Traceroute},
 		&mtr.Tool{Mode: mtr.MTR},

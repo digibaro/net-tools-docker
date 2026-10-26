@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useQueryScope } from './queryScope'
 
 type Primitive = string | number | boolean
 
@@ -29,7 +30,8 @@ interface Options<T> {
 export function useQueryParam(options: Options<string>): Ref<string>
 export function useQueryParam(options: Options<number>): Ref<number>
 export function useQueryParam(options: Options<boolean>): Ref<boolean>
-export function useQueryParam({ name, defaultValue }: Options<Primitive>): Ref<Primitive> {
+export function useQueryParam({ name: own, defaultValue }: Options<Primitive>): Ref<Primitive> {
+  const name = `${useQueryScope()?.prefix ?? ''}${own}`
   const route = useRoute()
   const router = useRouter()
 

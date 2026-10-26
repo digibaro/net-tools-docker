@@ -89,6 +89,46 @@ paths:
                     properties:
                       data: { $ref: "#/components/schemas/Capabilities" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/auth/login:
+    get:
+      operationId: authLogin
+      summary: Start the OIDC login (only when AUTH_MODE=oidc); redirects to the identity provider
+      tags: [system]
+      parameters:
+        - { name: next, in: query, description: in-app path to return to, schema: { type: string } }
+      responses:
+        "302": { description: Redirect to the identity provider, or to /?auth_error=<code> }
+  /v1/auth/callback:
+    get:
+      operationId: authCallback
+      summary: OIDC redirect URI; sets the session cookie and redirects to next
+      tags: [system]
+      parameters:
+        - { name: code, in: query, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
+      responses:
+        "302": { description: "Redirect to next, or to /?auth_error=<state|exchange|token|not_allowed|denied|idp_unreachable>" }
+  /v1/auth/logout:
+    post:
+      operationId: authLogout
+      summary: Clear the session cookie; returns the identity provider's end-session URL when it has one
+      tags: [system]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data:
+                        type: object
+                        required: [logoutUrl]
+                        properties:
+                          logoutUrl: { type: string }
   /v1/echo:
     get:
       operationId: getEcho
@@ -2136,6 +2176,43 @@ paths:
                         properties:
                           results: { type: array, items: { $ref: "#/components/schemas/Geo" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/ping/monitor/stream:
+    get:
+      operationId: pingMonitorStream
+      summary: Long-running latency monitor (smokeping-style) for up to MONITOR_MAX_MINUTES (SSE)
+      description: "Events: meta, sent ({seq, at})*, reply (PingReply)*, done ({summary: RttSummary, durationMs}) or error."
+      tags: [connectivity]
+      x-capability: net.monitor
+      parameters:
+        - { name: target, in: query, required: true, schema: { type: string } }
+        - { name: minutes, in: query, schema: { type: integer, minimum: 1, default: 5 } }
+        - { name: interval, in: query, description: seconds between probes, schema: { type: integer, minimum: 1, maximum: 10, default: 1 } }
+        - { name: family, in: query, schema: { type: integer, enum: [4, 6] } }
+      responses:
+        "200":
+          description: Event stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /v1/providers/status:
+    get:
+      operationId: providersStatus
+      summary: "Public providers — key configured (never the key), requests, cache, errors and last problem since start"
+      tags: [system]
+      x-capability: sys.providers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/ProviderStatus" }
+        default: { $ref: "#/components/responses/Error" }
 components:
   parameters:
     Family:
@@ -2205,6 +2282,8 @@ components:
         - INTERNAL
         - NOT_FOUND
         - METHOD_NOT_ALLOWED
+        - UNAUTHENTICATED
+        - FORBIDDEN
     Version:
       type: object
       required: [version, commit, buildDate, goVersion]
@@ -2215,8 +2294,23 @@ components:
         goVersion: { type: string }
     Capabilities:
       type: object
-      required: [mode, tools, limits]
+      required: [mode, tools, limits, auth]
       properties:
+        auth:
+          type: object
+          required: [mode, user]
+          description: AUTH_MODE and the signed-in user (from the session cookie; null when anonymous or auth is off)
+          properties:
+            mode: { type: string, enum: ["off", oidc] }
+            user:
+              oneOf:
+                - type: "null"
+                - type: object
+                  required: [name, role]
+                  properties:
+                    name: { type: string }
+                    email: { type: string }
+                    role: { type: string, enum: [user, admin] }
         mode:
           type: object
           required: [profile, allowPrivateTargets, lan]
@@ -2229,12 +2323,13 @@ components:
           additionalProperties: { $ref: "#/components/schemas/Capability" }
         limits:
           type: object
-          required: [pingMaxCount, pingMinIntervalMs, tracerouteMaxHops, mtrMaxCycles, portscanMaxPorts, iperfMaxSeconds, bulkMaxTargets]
+          required: [pingMaxCount, pingMinIntervalMs, tracerouteMaxHops, mtrMaxCycles, portscanMaxPorts, iperfMaxSeconds, bulkMaxTargets, monitorMaxMinutes]
           properties:
             pingMaxCount: { type: integer }
             pingMinIntervalMs: { type: integer }
             tracerouteMaxHops: { type: integer }
             mtrMaxCycles: { type: integer }
+            monitorMaxMinutes: { type: integer }
             portscanMaxPorts: { type: integer }
             iperfMaxSeconds: { type: integer }
             bulkMaxTargets: { type: integer }
@@ -2245,7 +2340,7 @@ components:
         enabled: { type: boolean }
         reason:
           type: string
-          enum: [disabled_by_admin, provider_key_missing, requires_lan_mode, binary_missing, data_missing]
+          enum: [disabled_by_admin, provider_key_missing, requires_lan_mode, binary_missing, data_missing, login_required, forbidden_role]
     Echo:
       type: object
       required: [ip, family, protocol, scheme, method, userAgent, headers]
@@ -4573,4 +4668,25 @@ components:
               city: { type: string }
               country: { type: string }
               facId: { type: integer }
-
+    ProviderStatus:
+      type: object
+      required: [since, providers]
+      properties:
+        since: { type: string, format: date-time }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [name, secret, keyConfigured, keyOptional, requests, fetches, errors, lastOk, lastError, lastProblem, lastLatencyMs]
+            properties:
+              name: { type: string }
+              secret: { type: string, description: name of the environment variable (never its value) }
+              keyConfigured: { type: boolean }
+              keyOptional: { type: boolean }
+              requests: { type: integer }
+              fetches: { type: integer }
+              errors: { type: integer }
+              lastOk: { type: [string, "null"], format: date-time }
+              lastError: { type: [string, "null"], format: date-time }
+              lastProblem: { type: string }
+              lastLatencyMs: { type: integer }

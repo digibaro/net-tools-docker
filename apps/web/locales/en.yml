@@ -70,6 +70,8 @@ runMode:
 capabilities:
   disabledTitle: This tool is unavailable
   reasons:
+    login_required: Sign in to use this tool.
+    forbidden_role: This tool is limited to administrators.
     disabled_by_admin: Disabled by the administrator.
     provider_key_missing: Requires an API key that is not configured on the server.
     requires_lan_mode: Requires LAN mode (host networking) on the server.
@@ -78,6 +80,9 @@ capabilities:
     api_unreachable: The NET-TOOLS server cannot be reached. Browser-only tools still work.
     unavailable: Not available on this server.
 apiErrors:
+  retryIn: 'You can try again in {s} s.'
+  retryNow: You can try again now.
+  budget: '{n} of {limit} heavy requests left this minute (scans, streams and provider lookups share this limit).'
   INVALID_INPUT: Invalid input
   TARGET_UNRESOLVABLE: Target could not be resolved
   TARGET_PRIVATE_DENIED: Private and internal targets are not allowed on this server
@@ -88,6 +93,8 @@ apiErrors:
   RATE_LIMITED: Too many requests, please wait
   BUSY: Server is busy, try again shortly
   PROVIDER_ERROR: The upstream service failed
+  UNAUTHENTICATED: Sign in required
+  FORBIDDEN: Not allowed
   INTERNAL: Unexpected server error
   NOT_FOUND: Endpoint not found
   METHOD_NOT_ALLOWED: Method not allowed
@@ -160,6 +167,52 @@ ping:
   count: Count
   interval: Interval (ms)
   run: Start
+report:
+  add: Add to report
+  added: Added to the report (see Report bundle).
+  full: The report could not be saved (browser storage full).
+  score: 'Score {score}/100 — {fail} problem(s), {warn} warning(s)'
+  status:
+    pass: OK
+    info: Info
+    warn: Warning
+    fail: Problem
+    skipped: Not checked
+  columns:
+    status: Result
+    check: Check
+    detail: Detail
+auth:
+  signIn: Sign in
+  signOut: Sign out
+  account: 'Account: {name}'
+  roles:
+    user: user
+    admin: administrator
+  errors:
+    state: The sign-in took too long or was started in another tab. Please try again.
+    exchange: The identity provider did not accept the sign-in. Please try again.
+    token: The identity provider's answer could not be verified.
+    not_allowed: Your account is not in a group that may use NET-TOOLS.
+    denied: The sign-in was cancelled or refused by the identity provider.
+    idp_unreachable: The identity provider cannot be reached from the NET-TOOLS server.
+    internal: Sign-in failed.
+compare:
+  nav: Compare
+  open: Compare side by side
+  title: 'Compare: {tool}'
+  swap: Swap sides
+  copy: Copy left to right
+  single: Open the single tool
+  noTool: No tool selected. Use the compare button on a tool page.
+  side:
+    a: Left
+    b: Right
+history:
+  recent: 'Recent:'
+  pin: Pin
+  unpin: Unpin
+  clear: Clear history (pinned entries stay)
 trace:
   asPath: 'AS path:'
   map: 'Route of the trace over {n} located hops'
@@ -2278,6 +2331,9 @@ tools:
       kind: Kind
       protocol: Protocol
   speed-test:
+    loadedDown: Latency while downloading
+    loadedUp: Latency while uploading
+    bloat: 'Bufferbloat grade {grade}: latency rises by {ms} ms under load. Above about 30 ms, calls and games suffer while the line is busy — smart queue management (fq_codel / cake) on the router fixes most of it.'
     title: Browser ↔ server speed test
     description: Measure download, upload and latency between your browser and this NET-TOOLS server.
     intro: Transfers random data with three parallel streams for about ten seconds per direction.
@@ -3444,3 +3500,368 @@ tools:
       server: Server resolver
       pub: Public DNS (DoH, from your browser)
       verdict: Result
+  poe-budget-calculator:
+    title: PoE budget calculator
+    description: Does the switch's PoE budget cover all access points, cameras and phones? Class-based or LLDP-negotiated allocation per IEEE 802.3af/at/bt.
+    budget: Switch PoE budget (W)
+    devices: Devices (name, class, count, optional measured W)
+    help: 'One device type per line, e.g. "Access point, 4, 6". Class-based switches reserve the class maximum per port; with LLDP power negotiation only what the device asks for.'
+    over: The devices need more power than the switch can deliver — some ports will not power up.
+    fits: 'The budget is {pct} % allocated.'
+    classes: PoE classes
+    cls: Class
+    modes:
+      class: Class-based
+      lldp: LLDP-negotiated
+    fields:
+      ports: Powered ports
+      allocated: Allocated
+      drawn: Drawn by the devices
+      remaining: Remaining budget
+      pse: At switch (W)
+      pd: At device (W)
+  nat-capacity-calculator:
+    title: NAT / PAT capacity calculator
+    description: How many subscribers fit behind a set of public IPs with CGNAT port blocks, how many IPs you need, and which port block a subscriber gets (deterministic NAT, RFC 7422).
+    fits: 'Fits: the port blocks and the public addresses cover every subscriber.'
+    short: 'Does not fit: you need {ips} public IP(s) at this block size.'
+    deterministic: Deterministic NAT lookup
+    subscriber: Subscriber number (from 0)
+    slot: 'Public IP #{ip}, ports {from} – {to}'
+    noSlot: This subscriber number does not fit.
+    inputs:
+      subscribers: Subscribers
+      sessionsPerSubscriber: Sessions per subscriber
+      publicIps: Public IPv4 addresses
+      portLow: Lowest port
+      portHigh: Highest port
+      blockSize: Port block size
+    fields:
+      portsPerIp: Ports per public IP
+      needed: Sessions needed / available
+      perIp: Subscribers per public IP
+      max: Maximum subscribers
+      ipsNeeded: Public IPs needed
+  wireless-link-calculator:
+    title: Point-to-point wireless link calculator
+    description: Link budget for a radio link — free-space path loss, EIRP, receive level and fade margin — plus the Fresnel zone clearance and earth bulge that set the mast height.
+    note: 'Free-space model for a clear line of sight: rain, foliage and multipath are not included. Plan at least 60 % of the first Fresnel zone free of obstacles; the earth bulge uses k = 4/3 (standard atmosphere).'
+    grade:
+      good: 'Fade margin {margin} dB: a robust link.'
+      ok: 'Fade margin {margin} dB: works, but rain, interference or misalignment can drop it.'
+      poor: 'Fade margin {margin} dB: too little — use higher-gain antennas, more power or a shorter path.'
+    inputs:
+      freqGHz: Frequency (GHz)
+      distanceKm: Distance (km)
+      txDbm: Transmit power (dBm)
+      txGainDbi: TX antenna gain (dBi)
+      rxGainDbi: RX antenna gain (dBi)
+      cableLossDb: Cable loss per side (dB)
+      sensitivityDbm: Receiver sensitivity (dBm)
+    fields:
+      fspl: Free-space path loss
+      rx: Received signal level
+      margin: Fade margin
+      fresnel: First Fresnel zone radius (mid-path)
+      clearance: 60 % clearance needed
+      bulge: Earth bulge (mid-path)
+      mast: Minimum height above obstacles
+  dscp-converter:
+    title: DSCP / ToS / CoS converter
+    description: Convert between DSCP names and values, the ToS byte, IP precedence and 802.1p CoS, with the RFC 4594 traffic class and marking snippets for Cisco, Juniper, Linux and MikroTik.
+    input: DSCP name or value, ToS byte, binary or precedence
+    invalid: 'Enter for example EF, AF41, 46, 0xb8, "tos 184", 101110 or "prec 5".'
+    snippets: Marking examples (SIP signalling on UDP 5060 as example match)
+    table: All per-hop behaviours
+    fields:
+      name: Per-hop behaviour
+      binary: Binary
+      tos: ToS byte
+      precedence: IP precedence
+      cos: 802.1p CoS (common mapping)
+      drop: Drop precedence
+      use: Typical use (RFC 4594)
+    drop:
+      low: low (dropped last)
+      medium: medium
+      high: high (dropped first)
+    uses:
+      best-effort: Best effort / default
+      lower-effort: Lower effort (background)
+      scavenger: Scavenger / bulk
+      high-throughput: High-throughput data
+      oam: Network management (OAM)
+      low-latency-data: Low-latency data (transactions)
+      broadcast-video: Broadcast video
+      multimedia-streaming: Multimedia streaming
+      real-time-interactive: Real-time interactive
+      multimedia-conferencing: Video conferencing
+      signaling: Call signalling
+      telephony: Voice (telephony)
+      network-control: Network control (routing protocols)
+      reserved: Reserved / network control
+      unassigned: Not assigned to a standard PHB
+  dns-ttl-planner:
+    title: DNS migration / TTL planner
+    description: Plan a DNS change — when to lower the TTL, when the switch is safe, when it is visible everywhere and when to raise the TTL again — and add the steps to your calendar.
+    name: Record
+    fetch: Read the current TTL
+    fetched: 'Current TTL read from public DNS: {ttl} s (a cache may show less than the configured value).'
+    noRecord: No A record found — enter the TTL yourself.
+    ttl: Current TTL (s)
+    low: Temporary low TTL (s)
+    change: Moment of the change
+    plan: Plan
+    when: When
+    what: Step
+    worst: 'After the change, resolvers that follow TTLs show the new record within {min} minute(s). Some resolvers ignore TTLs — keep the old target working a little longer.'
+    ics: Download as calendar (.ics)
+    steps:
+      lower: 'Lower the TTL to {low} s'
+      lowered: 'All caches now hold the record for at most {low} s'
+      change: Make the change
+      propagated: Change visible for resolvers that follow TTLs
+      restore: 'Check, then raise the TTL back to {ttl} s'
+  tls-rpt-viewer:
+    title: TLS-RPT report viewer
+    description: Open SMTP TLS reports (RFC 8460, JSON or .gz) in your browser — success rate per reporter and which MX hosts fail MTA-STS or DANE, and why.
+    upload: Choose report files
+    note: 'Reports are the files that Google, Microsoft and others send to the address in your _smtp._tls TXT record. They are read in your browser and never uploaded.'
+    unreadable: 'Not a TLS-RPT report: {files}'
+    summary: '{n} report(s)'
+    allOk: 'All sessions were encrypted as your policy requires ({rate} %).'
+    someFail: '{failure} session(s) failed ({rate} % successful) — see the failures below.'
+    failures: Failures
+    reports: Reports
+    types: 'Common causes: certificate-expired / -host-mismatch / -not-trusted (certificate), starttls-not-supported, sts-policy-fetch-error or sts-webpki-invalid (MTA-STS policy), tlsa-invalid or dnssec-invalid (DANE).'
+    columns:
+      success: Successful sessions
+      failure: Failed sessions
+      type: Result type
+      sessions: Sessions
+      reporters: Reported by
+      org: Reporter
+      period: Period
+      policy: Policy
+  subnet-overlap-checker:
+    title: Subnet overlap checker
+    description: Find overlapping and duplicate prefixes between sites, VPN peers and cloud networks before you connect them — IPv4 and IPv6.
+    input: Prefixes
+    help: 'One prefix per line, optionally with a label ("10.0.0.0/16 office" or "office: 10.0.0.0/16"). A line "# Site name" labels the lines below it. Only overlaps between different labels are reported, unless you switch that on.'
+    same: Also report overlaps within one label
+    found: '{n} overlap(s) among {total} prefixes.'
+    none: 'No overlaps among {total} prefixes.'
+    invalid: 'Lines that are not a prefix: {lines}'
+    relations:
+      identical: is the same as
+      contains: contains
+    columns:
+      a: Prefix
+      b: Prefix
+      label: Label
+      relation: Relation
+      lines: Lines
+  prefix-list-tester:
+    title: Prefix-list / route-filter tester
+    description: Paste a Cisco prefix-list or Junos route-filter / prefix-list and see which line permits or denies each route — ge/le, orlonger, upto and the implicit deny.
+    config: Prefix-lists or route-filters
+    help: '{n} entries read. Cisco "ip prefix-list NAME seq N permit P ge X le Y", Junos "route-filter P orlonger / exact / longer / upto /N / prefix-length-range /A-/B, accept or reject" and prefix-list NAME blocks or set commands.'
+    routes: Routes to test (one per line)
+    unparsed: 'Lines not understood: {lines}'
+    invalidRoute: not a prefix
+    implicit: no line matches — implicit deny
+    results:
+      permit: permit
+      deny: deny
+    columns:
+      route: Route
+      list: List
+      result: Result
+      entry: Matching line
+  bgp-community-decoder:
+    title: BGP community decoder
+    description: Decode standard, large and extended BGP communities — well-known values such as NO_EXPORT and BLACKHOLE, private ASNs, route-server conventions and route targets — straight from show output.
+    input: Communities (or paste show ip bgp / show route detail output)
+    help: 'Accepts 65000:100, no-export, 4294901761, large 65000:1:2, rt:65000:100, soo:… and 8-byte hex extended communities. Values other than the well-known ones mean what the network that sets them defines; the meanings shown for route-server conventions apply only if that route server follows them.'
+    kinds:
+      standard: Standard
+      large: Large
+      extended: Extended
+    columns:
+      input: Input
+      kind: Type
+      value: Value
+      meaning: Meaning
+      detail: Detail
+  config-diff:
+    title: Network config diff
+    description: Compare two router or switch configurations per section — Cisco/Arista/NX-OS indentation, Junos braces or set style — ignoring line order, timestamps and comments, with secrets masked.
+    before: Before
+    after: After
+    format: Format
+    note: The configurations are compared in your browser and are not stored in the link. Lines inside a section are compared as a set; a section whose lines only changed order (relevant for ACLs) is marked as reordered.
+    summary: '{sections} section(s) changed: {removed} line(s) removed, {added} added'
+    same: The configurations are the same (ignoring order, comments and timestamps).
+    global: (global)
+    reordered: same lines, different order
+    formats:
+      auto: Detect
+      indented: Indented (Cisco IOS, Arista EOS, NX-OS)
+      junos: Junos (braces)
+      set: Junos / VyOS (set commands)
+  acl-analyzer:
+    title: ACL / firewall rule analyzer
+    description: Find shadowed, redundant and overly wide rules in Cisco IOS and ASA access lists, and trace which line a packet hits.
+    input: Access list
+    help: '{n} rule(s) read. Cisco IOS named or numbered ACLs (wildcards, host, any, eq / range / gt / lt / neq, established) and ASA "access-list NAME extended …" with netmasks. Object groups and non-contiguous wildcards are not evaluated.'
+    unsupported: 'Lines not evaluated: {lines}'
+    analysis: Analysis
+    found: '{n} finding(s).'
+    clean: No shadowed, redundant or overly wide rules found.
+    tester: Packet tracer
+    acl: ACL
+    proto: Protocol
+    src: Source IP
+    dst: Destination IP
+    port: Destination port
+    hit: 'Line {line} ({action}): {rule}'
+    implicit: No line matches — denied by the implicit deny at the end.
+    kinds:
+      shadowed: Shadowed (never hit, earlier rule decides otherwise)
+      redundant: Redundant (earlier rule already does this)
+      wide: Very wide permit
+    columns:
+      line: Line
+      rule: Rule
+      kind: Finding
+      by: Covered by
+  latency-monitor:
+    title: Latency monitor
+    description: Ping a host for up to half an hour and watch latency, jitter and loss per minute — smokeping-style, to catch intermittent problems a short ping misses.
+    minutes: 'Duration (minutes, max {max})'
+    interval: Interval (seconds)
+    run: Start monitoring
+    progress: Monitoring progress
+    chart: Latency over time
+    note: Runs from the NET-TOOLS server. Keep this page open; stopping or closing it ends the measurement.
+    fields:
+      probes: Replies / probes
+      loss: loss
+      latency: min / median / p95 / max
+      jitter: Jitter
+      minute: Minute
+      sent: Probes
+  dns-health-report:
+    title: DNS health report
+    description: One report for a zone — nameserver count and spread, lame or unresponsive servers, SOA serials and timers, DNSSEC, EDNS compliance, CAA and MX — with a grade.
+    zone: Zone
+    run: Check the zone
+    note: Combines the DNS consistency, DNSSEC, EDNS compliance and lookup tools, run from the NET-TOOLS server.
+    result: 'DNS health of {zone}'
+    checks:
+      nsCount: At least two nameservers
+      nsDiversity: Nameservers in more than one network (/24)
+      nsResponding: Every nameserver answers
+      authoritative: Every nameserver is authoritative (no lame delegation)
+      serials: SOA serial is the same on every server
+      nsSets: NS set is the same on every server
+      rtt: Nameservers answer within 500 ms
+      soa: SOA record present
+      soaRefresh: SOA refresh 20 min – 1 day
+      soaRetry: SOA retry at least 2 min and below refresh
+      soaExpire: SOA expire 1 – 4 weeks
+      soaMinimum: SOA minimum (negative caching) 5 min – 1 day
+      dnssec: DNSSEC
+      edns: EDNS compliance of the nameservers
+      caa: CAA record restricts certificate issuers
+      mx: Mail exchangers
+  email-deliverability-report:
+    title: Email deliverability report
+    description: One score for a mail domain — MX and STARTTLS, SPF, DKIM, DMARC policy and reporting, MTA-STS, TLS-RPT, BIMI, DANE and reverse DNS of the mail server.
+    domain: Mail domain
+    selector: DKIM selector (optional)
+    run: Check the domain
+    note: 'Combines the email, DANE and SMTP banner tools, run from the NET-TOOLS server. Many hosting networks block outgoing port 25; the STARTTLS and banner checks are then skipped. DKIM needs a selector (see the s= tag in the DKIM-Signature header of a sent message).'
+    result: 'Deliverability of {domain}'
+    checks:
+      mx: Mail exchangers (MX)
+      starttls: Every MX offers STARTTLS
+      mxCert: MX certificates are valid
+      spf: SPF record valid
+      spfAll: SPF ends with -all or ~all
+      spfLookups: 'SPF uses at most 10 DNS lookups ({n})'
+      dmarc: DMARC record valid
+      dmarcPolicy: DMARC policy quarantine or reject, for all mail
+      dmarcRua: DMARC aggregate reports requested (rua)
+      dkim: DKIM key published
+      mtaSts: MTA-STS policy in enforce mode
+      tlsRpt: TLS-RPT reporting set up
+      bimi: BIMI record (brand logo)
+      dane: DANE / TLSA for the MX hosts
+      fcrdns: 'Reverse DNS of {host} confirms forward (FCrDNS)'
+  provider-status:
+    title: Provider status
+    description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.
+    intro: Counts are kept in memory since the api container started; cached answers do not reach the provider.
+    refresh: Refresh
+    since: 'Since {time}'
+    set: set
+    optional: optional, not set
+    missing: not set
+    keyless: no key needed
+    states:
+      ok: Working
+      failing: Last call failed
+      no-key: Key missing
+      unused: Not used yet
+    columns:
+      name: Provider
+      state: State
+      key: API key
+      requests: Requests
+      cache: From cache
+      errors: Errors
+      lastOk: Last success
+      problem: Last problem
+  report-bundle:
+    title: Report bundle
+    description: Collect result tables from several tools into one report, then print it or download it as Markdown or JSON for a ticket or change record.
+    intro: Use "Add to report" under any result table. The report is kept in this browser only (at most 30 items, 500 rows each).
+    heading: NET-TOOLS report
+    markdown: Download Markdown
+    json: Download JSON
+    print: Print / PDF
+    clear: Clear report
+    confirmClear: Remove all items from the report?
+    empty: The report is empty. Use "Add to report" under a result table.
+    truncated: (first 500 rows)
+    up: Move up
+    down: Move down
+    remove: Remove from report
+  bulk-lookup:
+    title: Bulk lookup
+    description: Run a DNS, reverse DNS, IP-to-ASN or port check for a list of up to 100 targets, paced to the rate limit, with one result table to export.
+    targets: 'Targets (one per line, at most {max})'
+    placeholder: "example.com\nexample.net\n# comments are ignored"
+    op: Lookup
+    type: Record type
+    ports: Ports (at most 10)
+    count: '{n} target(s).'
+    tooMany: 'Only the first {max} are used.'
+    run: Run
+    stop: Stop
+    waiting: 'Rate limit reached — continuing in {s} s.'
+    ops:
+      dns: DNS lookup
+      reverse: Reverse DNS (PTR)
+      asn: IP to ASN
+      port: TCP port check
+    status:
+      ok: OK
+      empty: No answer
+      error: Error
+    columns:
+      target: Target
+      status: Status
+      result: Result
+      detail: Detail

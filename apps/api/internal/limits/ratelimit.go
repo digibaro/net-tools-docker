@@ -51,6 +51,12 @@ func burst(rpm int) int {
 
 // Allow consumes a token; when denied it returns the wait until the next token.
 func (l *RateLimiter) Allow(class Class, ip netip.Addr) (bool, time.Duration) {
+	ok, wait, _ := l.AllowN(class, ip)
+	return ok, wait
+}
+
+// AllowN is Allow that also reports the whole tokens left in the bucket afterwards.
+func (l *RateLimiter) AllowN(class Class, ip netip.Addr) (bool, time.Duration, int) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	now := l.now()
@@ -68,10 +74,12 @@ func (l *RateLimiter) Allow(class Class, ip netip.Addr) (bool, time.Duration) {
 	r := v.limiter.ReserveN(now, 1)
 	if delay := r.DelayFrom(now); delay > 0 {
 		r.CancelAt(now)
-		return false, delay
+		return false, delay, 0
 	}
-	return true, 0
+	return true, 0, max(0, int(v.limiter.TokensAt(now)))
 }
+
+var classNames = map[Class]string{Light: "light", Heavy: "heavy"}
 
 // evict drops visitors idle for more than 10 minutes (called with mu held).
 func (l *RateLimiter) evict(class Class, now time.Time) {
@@ -87,7 +95,12 @@ func (l *RateLimiter) evict(class Class, now time.Time) {
 func (l *RateLimiter) Middleware(class Class, clientIP func(*http.Request) netip.Addr, onDenied func(http.ResponseWriter, *http.Request)) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ok, wait := l.Allow(class, clientIP(r))
+			ok, wait, left := l.AllowN(class, clientIP(r))
+			// Tell the UI how much is left (it shows a hint when only a few requests remain).
+			h := w.Header()
+			h.Set("X-RateLimit-Class", classNames[class])
+			h.Set("X-RateLimit-Limit", strconv.Itoa(l.rpm[class]))
+			h.Set("X-RateLimit-Remaining", strconv.Itoa(left))
 			if !ok {
 				secs := int(wait.Seconds()) + 1
 				w.Header().Set("Retry-After", strconv.Itoa(secs))

@@ -8,12 +8,14 @@ import CCard from '@/ui/c-card.vue'
 import CKeyValueList from '@/ui/c-key-value-list.vue'
 import { fixed } from '@/utils/format'
 import { probe, stats } from '../browser-latency/browser-latency.service'
-import { DOWNLOAD_BYTES, drain, mbps, nextUploadSize, PHASE_MS, randomPayload, STREAMS, TOKEN_HEADER, UPLOAD_MAX_BYTES, UPLOAD_MIN_BYTES } from './speed-test.service'
+import { bloatGrade, DOWNLOAD_BYTES, drain, mbps, nextUploadSize, PHASE_MS, randomPayload, sampleWhile, STREAMS, TOKEN_HEADER, UPLOAD_MAX_BYTES, UPLOAD_MIN_BYTES } from './speed-test.service'
 
 type Phase = 'idle' | 'latency' | 'download' | 'upload' | 'done' | 'error'
 const { t } = useI18n()
 const phase = ref<Phase>('idle')
 const latency = ref<ReturnType<typeof stats>>()
+const loadedDown = ref<ReturnType<typeof stats>>()
+const loadedUp = ref<ReturnType<typeof stats>>()
 const download = ref(0)
 const upload = ref(0)
 const live = ref(0)
@@ -71,7 +73,7 @@ async function run() {
   controller = c
   failure.value = ''
   download.value = upload.value = live.value = 0
-  latency.value = undefined
+  latency.value = loadedDown.value = loadedUp.value = undefined
   try {
     phase.value = 'latency'
     // One session per test: the server rate-limits the session, not each of its many requests.
@@ -82,11 +84,17 @@ async function run() {
     for (let i = 0; i < 10; i++)
       samples.push(await probe('/api/v1/speedtest/ping', c.signal, undefined, headers))
     latency.value = stats(samples)
+    // Latency under load (bufferbloat): keep probing while the link is saturated.
+    const ping = () => probe('/api/v1/speedtest/ping', c.signal, undefined, headers)
     phase.value = 'download'
-    download.value = await measureDownload(c.signal, headers)
+    const down = await sampleWhile(measureDownload(c.signal, headers), ping)
+    download.value = down.result
+    loadedDown.value = stats(down.samples)
     live.value = 0
     phase.value = 'upload'
-    upload.value = await measureUpload(c.signal, headers)
+    const up = await sampleWhile(measureUpload(c.signal, headers), ping)
+    upload.value = up.result
+    loadedUp.value = stats(up.samples)
     phase.value = 'done'
   }
   catch (e) {
@@ -107,7 +115,16 @@ const rows = computed(() => [
   { label: t('tools.speed-test.download'), value: download.value ? `${fixed(download.value, 1)} Mbit/s` : '—' },
   { label: t('tools.speed-test.upload'), value: upload.value ? `${fixed(upload.value, 1)} Mbit/s` : '—' },
   { label: t('tools.speed-test.latency'), value: latency.value?.received ? `${latency.value.median} ms (${t('ping.jitter')} ${latency.value.jitter} ms)` : '—' },
+  { label: t('tools.speed-test.loadedDown'), value: loadedDown.value?.received ? `${loadedDown.value.median} ms (+${fixed(Math.max(0, loadedDown.value.median - (latency.value?.median ?? 0)), 0)} ms)` : '—' },
+  { label: t('tools.speed-test.loadedUp'), value: loadedUp.value?.received ? `${loadedUp.value.median} ms (+${fixed(Math.max(0, loadedUp.value.median - (latency.value?.median ?? 0)), 0)} ms)` : '—' },
 ])
+/** Worst of the two directions decides the bufferbloat grade. */
+const bloat = computed(() => {
+  if (!latency.value?.received || !loadedDown.value?.received || !loadedUp.value?.received)
+    return undefined
+  const increase = Math.max(loadedDown.value.median, loadedUp.value.median) - latency.value.median
+  return { grade: bloatGrade(increase), increase: Math.max(0, Math.round(increase)) }
+})
 </script>
 
 <template>
@@ -140,8 +157,11 @@ const rows = computed(() => [
       <NProgress type="line" :percentage="phase === 'latency' ? 15 : phase === 'download' ? 50 : 85" :show-indicator="false" :aria-label="t(`tools.speed-test.phase.${phase}`)" />
     </div>
     <CKeyValueList :rows="rows" />
+    <NAlert v-if="phase === 'done' && bloat" :type="['A+', 'A'].includes(bloat.grade) ? 'success' : ['B', 'C'].includes(bloat.grade) ? 'warning' : 'error'" class="mt-3" data-testid="bufferbloat">
+      {{ t('tools.speed-test.bloat', { grade: bloat.grade, ms: bloat.increase }) }}
+    </NAlert>
     <div v-if="phase === 'done'" class="mt-3">
-      <ResultActions :text="() => rows.map(r => `${r.label}: ${r.value}`).join('\n')" :json="{ downloadMbps: download, uploadMbps: upload, latency }" filename="speed-test.json" />
+      <ResultActions :text="() => rows.map(r => `${r.label}: ${r.value}`).join('\n')" :json="{ downloadMbps: download, uploadMbps: upload, latency, loadedDownload: loadedDown, loadedUpload: loadedUp, bufferbloat: bloat }" filename="speed-test.json" />
     </div>
   </CCard>
 </template>

@@ -5,6 +5,7 @@ import { NButton, NIcon, NLayout, NLayoutContent, NLayoutHeader, NLayoutSider, N
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import AccountButton from '@/components/AccountButton.vue'
 import CollapsibleToolMenu from '@/components/CollapsibleToolMenu.vue'
 import LocaleSwitcher from '@/components/LocaleSwitcher.vue'
 import SidebarFooter from '@/components/SidebarFooter.vue'
@@ -105,6 +106,7 @@ function closeOnMobile() {
           <kbd class="ml-2 hidden text-xs nt-muted sm:inline">{{ shortcut }}</kbd>
         </NButton>
         <div class="ml-auto flex shrink-0 items-center gap-1">
+          <AccountButton />
           <ThemeSwitcher />
           <LocaleSwitcher />
           <NTooltip>

@@ -39,3 +39,38 @@ export async function drain(res: Response, onBytes: (n: number) => void): Promis
     // aborted at the end of the phase
   }
 }
+
+export type BloatGrade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'F'
+
+/** Bufferbloat grade from the latency increase under load (ms), on the commonly used scale. */
+export function bloatGrade(increaseMs: number): BloatGrade {
+  if (increaseMs < 5)
+    return 'A+'
+  if (increaseMs < 30)
+    return 'A'
+  if (increaseMs < 60)
+    return 'B'
+  if (increaseMs < 200)
+    return 'C'
+  return increaseMs < 400 ? 'D' : 'F'
+}
+
+/** Runs probe() every `everyMs` until `work` settles; returns the samples taken meanwhile. */
+export async function sampleWhile<T>(work: Promise<T>, probe: () => Promise<number | null>, everyMs = 300): Promise<{ result: T, samples: (number | null)[] }> {
+  const samples: (number | null)[] = []
+  const state = { done: false }
+  const loop = (async () => {
+    while (!state.done) {
+      const started = Date.now()
+      samples.push(await probe().catch(() => null))
+      await new Promise(r => setTimeout(r, Math.max(0, everyMs - (Date.now() - started))))
+    }
+  })()
+  try {
+    return { result: await work, samples }
+  }
+  finally {
+    state.done = true
+    await loop
+  }
+}

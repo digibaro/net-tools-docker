@@ -45,13 +45,20 @@ Error:
 | 400 | `TARGET_UNRESOLVABLE` | DNS resolution failed |
 | 403 | `TARGET_PRIVATE_DENIED` | Target is private/loopback/link-local and `ALLOW_PRIVATE_TARGETS=false` |
 | 403 | `TARGET_BLOCKED` | Matches deny-list (metadata IPs, configured CIDRs) |
+| 401 | `UNAUTHENTICATED` | `AUTH_MODE=oidc` and the tool needs a signed-in user |
+| 403 | `FORBIDDEN` | Signed in, but the tool is in `AUTH_ADMIN_TOOLS` |
 | 403 | `TOOL_DISABLED` | Feature flag off |
 | 403 | `PROVIDER_KEY_MISSING` | Public provider requires a key not configured |
 | 408 | `TIMEOUT` | Tool exceeded its timeout |
-| 429 | `RATE_LIMITED` | Per-IP limit hit (`Retry-After` header set) |
+| 429 | `RATE_LIMITED` | Per-IP limit hit (`Retry-After` header and `details.retryAfter` set) |
 | 503 | `BUSY` | Global concurrency pool for tool is full |
 | 502 | `PROVIDER_ERROR` | Upstream public API failed (`details.status`) |
 | 500 | `INTERNAL` | Bug; logged with request id |
+
+Rate-limited routes send `X-RateLimit-Class` (`light`/`heavy`), `X-RateLimit-Limit` (per minute) and
+`X-RateLimit-Remaining` on every response. A `RATE_LIMITED` or `BUSY` rejection of a request with
+`Accept: text/event-stream` is sent as HTTP 200 with one SSE `error` event (same `code`, `message`,
+`details.retryAfter`), because `EventSource` cannot read the body of an error response.
 
 ## 2. System endpoints
 
@@ -62,6 +69,10 @@ Error:
 | GET | `/api/v1/version` | `{version, commit, buildDate}` |
 | GET | `/api/v1/capabilities` | Tool availability (below) |
 | GET | `/api/v1/echo` | Client IP as seen, headers, protocol; used by IP-01, CLI-01, CLI-04 |
+| GET | `/api/v1/auth/login?next=` | OIDC login redirect (only with `AUTH_MODE=oidc`) |
+| GET | `/api/v1/auth/callback` | OIDC redirect URI; sets `nt_session`, redirects to `next` or `/?auth_error=<code>` |
+| POST | `/api/v1/auth/logout` | Clears the session; `{logoutUrl}` of the IdP when it has an end-session endpoint |
+| GET | `/api/v1/providers/status` | Provider key configured (bool), requests, fetches, errors, last client-safe problem; never keys or URLs |
 | GET | `/metrics` | Prometheus (only if `METRICS_ENABLED=true`, not proxied by nginx by default) |
 
 ### `/api/v1/capabilities`
@@ -124,6 +135,7 @@ Capability id in brackets. `target` always accepts hostname, IPv4 or IPv6; optio
 | Method | Path | Params | [cap] |
 |---|---|---|---|
 | GET | `/api/v1/ping/stream` | `target`, `count` (≤ `PING_MAX_COUNT`), `interval` (≥200ms), `size` | net.ping |
+| GET | `/api/v1/ping/monitor/stream` | `target, minutes ≤ MONITOR_MAX_MINUTES, interval 1–10 s` | net.monitor |
 | GET | `/api/v1/tcping/stream` | `target`, `port`, `count` | net.tcping |
 | GET | `/api/v1/traceroute/stream` | `target`, `proto=icmp|udp|tcp`, `port`, `maxHops` | net.traceroute |
 | GET | `/api/v1/mtr/stream` | `target`, `proto`, `cycles` | net.mtr |

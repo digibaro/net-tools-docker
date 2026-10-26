@@ -1,4 +1,5 @@
 import type { components } from './schema'
+import { recordRateLimit } from './ratelimit'
 
 type Schemas = components['schemas']
 
@@ -52,6 +53,7 @@ async function apiRequest<T>(path: string, init: RequestInit, options: RequestOp
     throw new ApiError('NETWORK_ERROR', err instanceof Error ? err.message : String(err))
   }
 
+  recordRateLimit(res.headers)
   let body: unknown
   try {
     body = await res.json()

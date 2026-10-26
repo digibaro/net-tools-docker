@@ -12,9 +12,11 @@ import (
 	"net/netip"
 	"testing"
 
+	"github.com/digibaro/net-tools-docker/apps/api/internal/auth"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/config"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/execx"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/httpapi"
+	"github.com/digibaro/net-tools-docker/apps/api/internal/providers"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/target"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools"
 )
@@ -37,6 +39,10 @@ type Options struct {
 	Exec *execx.Runner
 	// Deny adds always-denied prefixes (like DENY_CIDRS).
 	Deny []string
+	// Providers lets a test share (and inspect) the provider client.
+	Providers *providers.Client
+	// Auth lets a test issue sessions for the router's auth service.
+	Auth *auth.Service
 }
 
 // Config loads a test configuration (relaxed rate limits) with overrides.
@@ -66,11 +72,13 @@ func New(t testing.TB, tool tools.Tool, o Options) *Env {
 		res.Lookup = o.Lookup
 	}
 	h := httpapi.NewRouter(httpapi.Options{
-		Config: cfg,
-		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Tools:  []tools.Tool{tool},
-		Target: res,
-		Exec:   o.Exec,
+		Config:    cfg,
+		Logger:    slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Tools:     []tools.Tool{tool},
+		Target:    res,
+		Exec:      o.Exec,
+		Providers: o.Providers,
+		Auth:      o.Auth,
 	})
 	return &Env{t: t, Handler: h}
 }

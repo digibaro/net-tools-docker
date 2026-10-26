@@ -48,10 +48,10 @@ const erlRows = computed(() => [
       <CSelect v-model:value="codec" :label="t('tools.voip-bandwidth-calculator.codec')" :options="codecOptions" test-id="codec" />
       <CSelect v-model:value="link" :label="t('tools.voip-bandwidth-calculator.link')" :options="linkOptions" test-id="link" />
       <NFormItem :label="t('tools.voip-bandwidth-calculator.ptime')" :show-feedback="false" class="mb-3">
-        <NInputNumber :show-button="false" v-model:value="ptime" :min="10" :max="120" :step="10" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.ptime') }" />
+        <NInputNumber v-model:value="ptime" :show-button="false" :min="10" :max="120" :step="10" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.ptime') }" />
       </NFormItem>
       <NFormItem :label="t('tools.voip-bandwidth-calculator.calls')" :show-feedback="false" class="mb-3">
-        <NInputNumber :show-button="false" v-model:value="calls" :min="1" :max="100000" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.calls') }" />
+        <NInputNumber v-model:value="calls" :show-button="false" :min="1" :max="100000" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.calls') }" />
       </NFormItem>
     </div>
     <div class="mb-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
@@ -67,13 +67,13 @@ const erlRows = computed(() => [
   <CCard :title="t('tools.voip-bandwidth-calculator.erlang')">
     <div class="grid gap-x-4 sm:grid-cols-3">
       <NFormItem :label="t('tools.voip-bandwidth-calculator.bhca')" :show-feedback="false" class="mb-3">
-        <NInputNumber :show-button="false" v-model:value="busyCalls" :min="0" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.bhca') }" />
+        <NInputNumber v-model:value="busyCalls" :show-button="false" :min="0" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.bhca') }" />
       </NFormItem>
       <NFormItem :label="t('tools.voip-bandwidth-calculator.avg')" :show-feedback="false" class="mb-3">
-        <NInputNumber :show-button="false" v-model:value="avgMin" :min="0.1" :step="0.5" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.avg') }" />
+        <NInputNumber v-model:value="avgMin" :show-button="false" :min="0.1" :step="0.5" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.avg') }" />
       </NFormItem>
       <NFormItem :label="t('tools.voip-bandwidth-calculator.gos')" :show-feedback="false" class="mb-3">
-        <NInputNumber :show-button="false" v-model:value="blocking" :min="0.01" :max="50" :step="0.5" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.gos') }" />
+        <NInputNumber v-model:value="blocking" :show-button="false" :min="0.01" :max="50" :step="0.5" :input-props="{ 'aria-label': t('tools.voip-bandwidth-calculator.gos') }" />
       </NFormItem>
     </div>
     <CKeyValueList :rows="erlRows" data-testid="erlang" />

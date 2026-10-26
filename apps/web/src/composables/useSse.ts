@@ -1,5 +1,7 @@
 import { onScopeDispose, ref, shallowRef } from 'vue'
 import { ApiError } from '@/api/client'
+import { recordCurrent } from './history'
+import { useQueryScope } from './queryScope'
 import { buildQuery } from './useApi'
 
 type Params = Record<string, string | number | boolean | undefined>
@@ -29,6 +31,7 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
   const status = ref<SseStatus>('idle')
   const error = shallowRef<ApiError>()
   let source: EventSourceLike | undefined
+  const scope = useQueryScope()
 
   function close() {
     source?.close()
@@ -39,6 +42,7 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
     close()
     error.value = undefined
     status.value = 'running'
+    recordCurrent(scope)
     const es = createSource(`/api${path}${buildQuery(params)}`)
     source = es
     const events = new Set([...Object.keys(handlers), 'done', 'error'])
@@ -53,8 +57,8 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
           close()
         }
         else if (name === 'error') {
-          const e = (data ?? {}) as { code?: string, message?: string }
-          error.value = new ApiError((e.code ?? 'INTERNAL') as ApiError['code'], e.message ?? 'Stream error')
+          const e = (data ?? {}) as { code?: string, message?: string, details?: Record<string, unknown> }
+          error.value = new ApiError((e.code ?? 'INTERNAL') as ApiError['code'], e.message ?? 'Stream error', 0, e.details ?? {})
           status.value = 'error'
           close()
         }

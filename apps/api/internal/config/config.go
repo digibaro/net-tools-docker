@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/netip"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -41,6 +42,8 @@ type Limits struct {
 	ToolTimeoutDefault time.Duration
 	StreamTimeoutMax   time.Duration
 	BulkMaxTargets     int
+	// MonitorMaxMinutes bounds the long-running latency monitor (CON-18).
+	MonitorMaxMinutes int
 }
 
 // Features are admin feature flags.
@@ -68,6 +71,29 @@ type Features struct {
 	ProviderSecrets map[string]string
 }
 
+// Auth configures the optional OIDC login (docs/SECURITY.md §7). Off unless AUTH_MODE=oidc.
+type Auth struct {
+	Mode         string // off | oidc
+	Issuer       string
+	ClientID     string
+	ClientSecret string
+	RedirectURL  string
+	Scopes       []string
+	RolesClaim   string
+	AdminGroups  []string
+	// UserGroups, when set, limits who may sign in at all.
+	UserGroups    []string
+	SessionSecret string
+	SessionTTL    time.Duration
+	// AnonymousRole is what visitors get without signing in: none (only browser tools) or user.
+	AnonymousRole string
+	// AdminTools are capability ids only admins may use.
+	AdminTools []string
+}
+
+// Enabled reports whether OIDC login is on.
+func (a Auth) Enabled() bool { return a.Mode == "oidc" }
+
 // Config is the full API configuration.
 type Config struct {
 	Profile   Profile
@@ -77,6 +103,7 @@ type Config struct {
 	LogLevel  slog.Level
 	Limits    Limits
 	Features  Features
+	Auth      Auth
 }
 
 // providerSecretVars are read with *_FILE support and never logged.
@@ -143,6 +170,7 @@ func LoadFrom(lookup LookupFunc, readFile ReadFileFunc) (Config, error) {
 			ToolTimeoutDefault: p.duration("TOOL_TIMEOUT_DEFAULT", 15*time.Second),
 			StreamTimeoutMax:   p.duration("STREAM_TIMEOUT_MAX", 120*time.Second),
 			BulkMaxTargets:     p.posInt("BULK_MAX_TARGETS", 50),
+			MonitorMaxMinutes:  p.posInt("MONITOR_MAX_MINUTES", 30),
 		},
 		Features: Features{
 			Portscan:       p.boolean("PORTSCAN_ENABLED", relaxed),
@@ -165,6 +193,8 @@ func LoadFrom(lookup LookupFunc, readFile ReadFileFunc) (Config, error) {
 			RIPEstatSrcApp: p.str("RIPESTAT_SOURCEAPP", "nettools"),
 		},
 	}
+
+	cfg.Auth = p.auth(cfg.PublicURL, readFile)
 
 	cfg.Features.ProviderSecrets = make(map[string]string, len(providerSecretVars))
 	for _, name := range providerSecretVars {
@@ -203,6 +233,55 @@ func secret(lookup LookupFunc, readFile ReadFileFunc, name string) (string, erro
 		return "", fmt.Errorf("%s_FILE: %w", name, err)
 	}
 	return strings.TrimSpace(string(b)), nil
+}
+
+func list(s string) []string {
+	return strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ' ' })
+}
+
+// MinSessionSecret is the shortest accepted SESSION_SECRET (bytes).
+const MinSessionSecret = 32
+
+func (p *parser) auth(publicURL string, readFile ReadFileFunc) Auth {
+	a := Auth{
+		Mode:          strings.ToLower(p.str("AUTH_MODE", "off")),
+		Issuer:        p.str("OIDC_ISSUER", ""),
+		ClientID:      p.str("OIDC_CLIENT_ID", ""),
+		RedirectURL:   p.str("OIDC_REDIRECT_URL", strings.TrimSuffix(publicURL, "/")+"/api/v1/auth/callback"),
+		Scopes:        list(p.str("OIDC_SCOPES", "openid profile email")),
+		RolesClaim:    p.str("OIDC_ROLES_CLAIM", "groups"),
+		AdminGroups:   list(p.str("OIDC_ADMIN_GROUPS", "")),
+		UserGroups:    list(p.str("OIDC_USER_GROUPS", "")),
+		SessionTTL:    p.duration("SESSION_TTL", 12*time.Hour),
+		AnonymousRole: strings.ToLower(p.str("AUTH_ANONYMOUS_ROLE", "none")),
+		AdminTools:    list(p.str("AUTH_ADMIN_TOOLS", "sys.providers")),
+	}
+	for name, dst := range map[string]*string{"OIDC_CLIENT_SECRET": &a.ClientSecret, "SESSION_SECRET": &a.SessionSecret} {
+		v, err := secret(p.lookup, readFile, name)
+		if err != nil {
+			p.errs = append(p.errs, err)
+		}
+		*dst = v
+	}
+	switch a.Mode {
+	case "off":
+	case "oidc":
+		if a.Issuer == "" || a.ClientID == "" {
+			p.errs = append(p.errs, errors.New("AUTH_MODE=oidc needs OIDC_ISSUER and OIDC_CLIENT_ID"))
+		}
+		if len(a.SessionSecret) < MinSessionSecret {
+			p.errs = append(p.errs, fmt.Errorf("AUTH_MODE=oidc needs SESSION_SECRET of at least %d characters (openssl rand -hex 32)", MinSessionSecret))
+		}
+		if !slices.Contains(a.Scopes, "openid") {
+			a.Scopes = append([]string{"openid"}, a.Scopes...)
+		}
+	default:
+		p.errs = append(p.errs, fmt.Errorf("AUTH_MODE: want off or oidc, got %q", a.Mode))
+	}
+	if a.AnonymousRole != "none" && a.AnonymousRole != "user" {
+		p.errs = append(p.errs, fmt.Errorf("AUTH_ANONYMOUS_ROLE: want none or user, got %q", a.AnonymousRole))
+	}
+	return a
 }
 
 type parser struct {
