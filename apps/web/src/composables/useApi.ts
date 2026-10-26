@@ -1,5 +1,6 @@
 import { ref, shallowRef } from 'vue'
 import { ApiError, apiGet } from '@/api/client'
+import { recordCurrent } from './history'
 
 type Params = Record<string, string | number | boolean | undefined>
 
@@ -29,6 +30,7 @@ export function useApi<T>(path: string) {
     controller = current
     loading.value = true
     error.value = undefined
+    recordCurrent()
     try {
       data.value = await apiGet<T>(`${path}${suffix}${buildQuery(params)}`, { signal: current.signal })
       return data.value

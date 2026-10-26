@@ -175,6 +175,11 @@ report:
     status: Resultaat
     check: Controle
     detail: Detail
+history:
+  recent: 'Recent:'
+  pin: Vastzetten
+  unpin: Losmaken
+  clear: Geschiedenis wissen (vastgezette blijven)
 trace:
   asPath: 'AS-pad:'
   map: 'Route van de trace over {n} gelokaliseerde hops'

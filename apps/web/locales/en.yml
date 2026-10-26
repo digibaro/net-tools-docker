@@ -175,6 +175,11 @@ report:
     status: Result
     check: Check
     detail: Detail
+history:
+  recent: 'Recent:'
+  pin: Pin
+  unpin: Unpin
+  clear: Clear history (pinned entries stay)
 trace:
   asPath: 'AS path:'
   map: 'Route of the trace over {n} located hops'
