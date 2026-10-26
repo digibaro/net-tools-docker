@@ -74,6 +74,7 @@ func Tools() []tools.Tool {
 		&dnsconsistency.Tool{},
 		&dnscaa.Tool{},
 		&ping.Tool{},
+		&ping.MonitorTool{},
 		&tcping.Tool{},
 		&mtr.Tool{Mode: mtr.Traceroute},
 		&mtr.Tool{Mode: mtr.MTR},

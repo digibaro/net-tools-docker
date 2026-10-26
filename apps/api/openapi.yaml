@@ -2136,6 +2136,24 @@ paths:
                         properties:
                           results: { type: array, items: { $ref: "#/components/schemas/Geo" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/ping/monitor/stream:
+    get:
+      operationId: pingMonitorStream
+      summary: Long-running latency monitor (smokeping-style) for up to MONITOR_MAX_MINUTES (SSE)
+      description: "Events: meta, sent ({seq, at})*, reply (PingReply)*, done ({summary: RttSummary, durationMs}) or error."
+      tags: [connectivity]
+      x-capability: net.monitor
+      parameters:
+        - { name: target, in: query, required: true, schema: { type: string } }
+        - { name: minutes, in: query, schema: { type: integer, minimum: 1, default: 5 } }
+        - { name: interval, in: query, description: seconds between probes, schema: { type: integer, minimum: 1, maximum: 10, default: 1 } }
+        - { name: family, in: query, schema: { type: integer, enum: [4, 6] } }
+      responses:
+        "200":
+          description: Event stream
+          content:
+            text/event-stream:
+              schema: { type: string }
 components:
   parameters:
     Family:
@@ -2229,12 +2247,13 @@ components:
           additionalProperties: { $ref: "#/components/schemas/Capability" }
         limits:
           type: object
-          required: [pingMaxCount, pingMinIntervalMs, tracerouteMaxHops, mtrMaxCycles, portscanMaxPorts, iperfMaxSeconds, bulkMaxTargets]
+          required: [pingMaxCount, pingMinIntervalMs, tracerouteMaxHops, mtrMaxCycles, portscanMaxPorts, iperfMaxSeconds, bulkMaxTargets, monitorMaxMinutes]
           properties:
             pingMaxCount: { type: integer }
             pingMinIntervalMs: { type: integer }
             tracerouteMaxHops: { type: integer }
             mtrMaxCycles: { type: integer }
+            monitorMaxMinutes: { type: integer }
             portscanMaxPorts: { type: integer }
             iperfMaxSeconds: { type: integer }
             bulkMaxTargets: { type: integer }
@@ -4573,4 +4592,3 @@ components:
               city: { type: string }
               country: { type: string }
               facId: { type: integer }
-

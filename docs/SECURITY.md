@@ -75,6 +75,7 @@ IDN homographs normalized, a fake resolver returning public then private IP (reb
 | `HTTP_MAX_BODY_BYTES` | 1 MiB | Response body read cap |
 | `TOOL_TIMEOUT_DEFAULT` | 15 s | Per request; streaming max 120 s |
 | `BULK_MAX_TARGETS` | 50 | For bulk tools (expiry, propagation) |
+| `MONITOR_MAX_MINUTES` | 30 | Longest latency monitor run (one ICMP echo per 1–10 s, holds one concurrency slot) |
 
 Fixed limits for tools that follow data from third parties (not configurable):
 

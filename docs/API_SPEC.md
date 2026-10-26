@@ -124,6 +124,7 @@ Capability id in brackets. `target` always accepts hostname, IPv4 or IPv6; optio
 | Method | Path | Params | [cap] |
 |---|---|---|---|
 | GET | `/api/v1/ping/stream` | `target`, `count` (≤ `PING_MAX_COUNT`), `interval` (≥200ms), `size` | net.ping |
+| GET | `/api/v1/ping/monitor/stream` | `target, minutes ≤ MONITOR_MAX_MINUTES, interval 1–10 s` | net.monitor |
 | GET | `/api/v1/tcping/stream` | `target`, `port`, `count` | net.tcping |
 | GET | `/api/v1/traceroute/stream` | `target`, `proto=icmp|udp|tcp`, `port`, `maxHops` | net.traceroute |
 | GET | `/api/v1/mtr/stream` | `target`, `proto`, `cycles` | net.mtr |

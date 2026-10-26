@@ -129,6 +129,7 @@ Rate limits and per-tool bounds keep the server from being abused. The most usef
 | `CONCURRENCY_PER_IP` / `CONCURRENCY_GLOBAL` | 3 / 32 | Simultaneous heavy requests |
 | `PORTSCAN_MAX_PORTS` / `PORTSCAN_RATE_PPS` | 1024 / 200 | Port scanner bounds |
 | `IPERF_MAX_SECONDS` | 15 | Longest iperf3 test |
+| `MONITOR_MAX_MINUTES` | 30 | Longest latency monitor run |
 
 The complete list with explanations is in [docs/SECURITY.md](docs/SECURITY.md).
 

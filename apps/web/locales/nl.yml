@@ -160,6 +160,18 @@ ping:
   count: Aantal
   interval: Interval (ms)
   run: Starten
+report:
+  score: 'Score {score}/100 — {fail} probleem/problemen, {warn} waarschuwing(en)'
+  status:
+    pass: OK
+    info: Info
+    warn: Waarschuwing
+    fail: Probleem
+    skipped: Niet gecontroleerd
+  columns:
+    status: Resultaat
+    check: Controle
+    detail: Detail
 trace:
   asPath: 'AS-pad:'
   map: 'Route van de trace over {n} gelokaliseerde hops'
@@ -2278,6 +2290,9 @@ tools:
       kind: Soort
       protocol: Protocol
   speed-test:
+    loadedDown: Latency tijdens downloaden
+    loadedUp: Latency tijdens uploaden
+    bloat: 'Bufferbloat-score {grade}: de latency stijgt {ms} ms onder belasting. Boven ongeveer 30 ms lijden gesprekken en games als de lijn bezet is — smart queue management (fq_codel / cake) op de router lost het meeste op.'
     title: Snelheidstest browser ↔ server
     description: Meet download, upload en latentie tussen je browser en deze NET-TOOLS-server.
     intro: Verstuurt willekeurige gegevens via drie parallelle streams, ongeveer tien seconden per richting.
@@ -3679,3 +3694,67 @@ tools:
       rule: Regel
       kind: Bevinding
       by: Gedekt door
+  latency-monitor:
+    title: Latency-monitor
+    description: Ping een host tot een half uur lang en volg latency, jitter en verlies per minuut — zoals smokeping, om haperingen te vangen die een korte ping mist.
+    minutes: 'Duur (minuten, max. {max})'
+    interval: Interval (seconden)
+    run: Monitoren starten
+    progress: Voortgang van de meting
+    chart: Latency in de tijd
+    note: Loopt vanaf de NET-TOOLS-server. Houd deze pagina open; stoppen of sluiten beëindigt de meting.
+    fields:
+      probes: Antwoorden / probes
+      loss: verlies
+      latency: min / mediaan / p95 / max
+      jitter: Jitter
+      minute: Minuut
+      sent: Probes
+  dns-health-report:
+    title: DNS-gezondheidsrapport
+    description: Eén rapport voor een zone — aantal en spreiding van nameservers, lame of niet-reagerende servers, SOA-serials en -timers, DNSSEC, EDNS-compliance, CAA en MX — met een cijfer.
+    zone: Zone
+    run: Zone controleren
+    note: Combineert de tools voor DNS-consistentie, DNSSEC, EDNS-compliance en lookups, uitgevoerd vanaf de NET-TOOLS-server.
+    result: 'DNS-gezondheid van {zone}'
+    checks:
+      nsCount: Minstens twee nameservers
+      nsDiversity: Nameservers in meer dan één netwerk (/24)
+      nsResponding: Elke nameserver antwoordt
+      authoritative: Elke nameserver is autoritatief (geen lame delegation)
+      serials: SOA-serial is op elke server gelijk
+      nsSets: NS-set is op elke server gelijk
+      rtt: Nameservers antwoorden binnen 500 ms
+      soa: SOA-record aanwezig
+      soaRefresh: SOA-refresh 20 min – 1 dag
+      soaRetry: SOA-retry minstens 2 min en lager dan refresh
+      soaExpire: SOA-expire 1 – 4 weken
+      soaMinimum: SOA-minimum (negatieve caching) 5 min – 1 dag
+      dnssec: DNSSEC
+      edns: EDNS-compliance van de nameservers
+      caa: CAA-record beperkt de certificaatuitgevers
+      mx: Mailservers
+  email-deliverability-report:
+    title: E-mailbezorgingsrapport
+    description: Eén score voor een maildomein — MX en STARTTLS, SPF, DKIM, DMARC-beleid en -rapportage, MTA-STS, TLS-RPT, BIMI, DANE en reverse DNS van de mailserver.
+    domain: Maildomein
+    selector: DKIM-selector (optioneel)
+    run: Domein controleren
+    note: 'Combineert de e-mail-, DANE- en SMTP-bannertools, uitgevoerd vanaf de NET-TOOLS-server. Veel hostingnetwerken blokkeren uitgaand poort 25; de STARTTLS- en bannercontroles worden dan overgeslagen. DKIM heeft een selector nodig (zie de s=-tag in de DKIM-Signature-header van een verstuurd bericht).'
+    result: 'Bezorging van {domain}'
+    checks:
+      mx: Mailservers (MX)
+      starttls: Elke MX biedt STARTTLS
+      mxCert: Certificaten van de MX'en zijn geldig
+      spf: SPF-record geldig
+      spfAll: SPF eindigt op -all of ~all
+      spfLookups: 'SPF gebruikt hooguit 10 DNS-lookups ({n})'
+      dmarc: DMARC-record geldig
+      dmarcPolicy: DMARC-beleid quarantine of reject, voor alle mail
+      dmarcRua: DMARC-verzamelrapporten aangevraagd (rua)
+      dkim: DKIM-sleutel gepubliceerd
+      mtaSts: MTA-STS-beleid in enforce-modus
+      tlsRpt: TLS-RPT-rapportage ingesteld
+      bimi: BIMI-record (merklogo)
+      dane: DANE / TLSA voor de MX-hosts
+      fcrdns: 'Reverse DNS van {host} bevestigt forward (FCrDNS)'

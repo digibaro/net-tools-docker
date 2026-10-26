@@ -70,6 +70,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | DNS-17 | HTTPS / SVCB & ECH viewer | RFC 9460 records, alias chasing, ECHConfigList decoding, DDR | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-18 | EDNS compliance test | ISC ednscomp-style tests per authoritative server | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-19 | DNS migration / TTL planner | Lower / change / restore timeline from the current TTL, iCalendar export | H | `/api/v1/dns/lookup` (optional) | — | 7 | ✅ |
+| DNS-20 | DNS health report | NS count / spread / lameness, serials, SOA timers, DNSSEC, EDNS, CAA, MX — graded | S | composed from DNS tools | — | 7 | ✅ |
 
 ## 3. Connectivity & Diagnostics
 
@@ -83,13 +84,14 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CON-06 | Port scanner | Bounded TCP connect scan (≤ `MAX_PORTS`), common-ports presets | S | Go worker pool; optional `nmap -sT` | Shodan InternetDB (passive) | 4 | ✅ |
 | CON-07 | Path MTU discovery | Find max non-fragmented packet size to target | S | `pro-bing` with DF + size bisection | — | 3 | ✅ |
 | CON-08 | Bandwidth test (iperf3) | TCP/UDP throughput to an iperf3 server | S | `iperf3 -c … --json` via execx | public iperf3 servers list (user-supplied) | 4 | ✅ |
-| CON-09 | Browser speed test | Download/upload/latency between browser and server | B+S | LibreSpeed container (`speedtest` profile) | Cloudflare speed test endpoints | 3 | ✅ |
+| CON-09 | Browser speed test | Download/upload/latency between browser and server, bufferbloat grade (latency under load) | B+S | LibreSpeed container (`speedtest` profile) | Cloudflare speed test endpoints | 3 | ✅ |
 | CON-10 | Global ping / "is it down" | Ping/HTTP from many countries, map view | P | — | Globalping API, check-host.net | 3 | ✅ |
 | CON-11 | NTP check | Query NTP server: offset, stratum, delay, refid | S | `github.com/beevik/ntp` | — | 2 | ✅ |
 | CON-12 | SNMP get / walk | v2c/v3 get/walk of an OID subtree (bounded) | S | `gosnmp` | — | 4 | ✅ |
 | CON-13 | Server network info | Interfaces, addresses, routes, resolvers, gateway of the api container/host | S | `net.Interfaces`, `/proc/net/route` | — | 2 | ✅ |
 | CON-14 | IPv6 readiness | Does target have AAAA, is it reachable over v6 from server | S | DNS + dial | Globalping | 3 | ✅ |
 | CON-15 | Latency matrix | Ping multiple targets in parallel, compare | S | `pro-bing` fan-out | Globalping | 3 | ✅ |
+| CON-18 | Latency monitor | Smokeping-style ping up to MONITOR_MAX_MINUTES, per-minute loss / latency / jitter | S | `pro-bing` | — | 7 | ✅ |
 
 ## 4. HTTP & Web
 
@@ -150,6 +152,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | EM-09 | Open relay test | Opt-in, bounded relay test of own server | S | `net/smtp` (no DATA sent) | — | 4 | ✅ |
 | EM-10 | SMTP banner & FCrDNS | PTR, forward confirmation, banner and EHLO name vs PTR, STARTTLS | S | `miekg/dns`, `net/smtp`-style probe | — | 6 | ✅ |
 | EM-11 | TLS-RPT report viewer | RFC 8460 reports (JSON / gzip): success rate, failures by type and MX | B | `fflate` | — | 7 | ✅ |
+| EM-12 | Email deliverability report | MX/STARTTLS, SPF, DKIM, DMARC, MTA-STS, TLS-RPT, BIMI, DANE, FCrDNS — graded | S | composed from email tools | — | 7 | ✅ |
 
 ## 7. Routing, BGP & Registry
 
