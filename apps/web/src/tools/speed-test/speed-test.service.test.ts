@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { drain, mbps, nextUploadSize, randomPayload } from './speed-test.service'
+import { bloatGrade, drain, mbps, nextUploadSize, randomPayload, sampleWhile } from './speed-test.service'
 
 describe('speed-test', () => {
   it('computes Mbit/s', () => {
@@ -23,5 +23,17 @@ describe('nextUploadSize', () => {
     expect(nextUploadSize(8 << 20, 100)).toBe(16 << 20)
     expect(nextUploadSize(32 << 20, 50)).toBe(32 << 20)
     expect(nextUploadSize(8 << 20, 900)).toBe(8 << 20)
+  })
+})
+
+describe('bufferbloat', () => {
+  it('grades the latency increase', async () => {
+    expect(bloatGrade(2)).toBe('A+')
+    expect(bloatGrade(45)).toBe('B')
+    expect(bloatGrade(500)).toBe('F')
+    let n = 0
+    const r = await sampleWhile(new Promise(res => setTimeout(res, 120, 'ok')), async () => ++n, 20)
+    expect(r.result).toBe('ok')
+    expect(r.samples.length).toBeGreaterThan(2)
   })
 })
