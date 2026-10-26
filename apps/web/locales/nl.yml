@@ -3444,3 +3444,164 @@ tools:
       server: Serverresolver
       pub: Publieke DNS (DoH, vanuit je browser)
       verdict: Resultaat
+  poe-budget-calculator:
+    title: PoE-budgetcalculator
+    description: Dekt het PoE-budget van de switch alle access points, camera's en telefoons? Toewijzing per klasse of via LLDP volgens IEEE 802.3af/at/bt.
+    budget: PoE-budget van de switch (W)
+    devices: Apparaten (naam, klasse, aantal, eventueel gemeten W)
+    help: 'Eén apparaattype per regel, bijv. "Access point, 4, 6". Switches met klassetoewijzing reserveren per poort het maximum van de klasse; met LLDP-onderhandeling alleen wat het apparaat vraagt.'
+    over: De apparaten hebben meer vermogen nodig dan de switch kan leveren — sommige poorten krijgen geen stroom.
+    fits: 'Het budget is voor {pct} % toegewezen.'
+    classes: PoE-klassen
+    cls: Klasse
+    modes:
+      class: Per klasse
+      lldp: Via LLDP
+    fields:
+      ports: Gevoede poorten
+      allocated: Toegewezen
+      drawn: Verbruik van de apparaten
+      remaining: Resterend budget
+      pse: Bij switch (W)
+      pd: Bij apparaat (W)
+  nat-capacity-calculator:
+    title: NAT- / PAT-capaciteitscalculator
+    description: Hoeveel abonnees passen achter een set publieke IP's met CGNAT-poortblokken, hoeveel IP's je nodig hebt, en welk poortblok een abonnee krijgt (deterministische NAT, RFC 7422).
+    fits: 'Past: de poortblokken en publieke adressen dekken alle abonnees.'
+    short: 'Past niet: je hebt bij deze blokgrootte {ips} publieke IP(''s) nodig.'
+    deterministic: Deterministische NAT opzoeken
+    subscriber: Abonneenummer (vanaf 0)
+    slot: 'Publiek IP #{ip}, poorten {from} – {to}'
+    noSlot: Dit abonneenummer past niet.
+    inputs:
+      subscribers: Abonnees
+      sessionsPerSubscriber: Sessies per abonnee
+      publicIps: Publieke IPv4-adressen
+      portLow: Laagste poort
+      portHigh: Hoogste poort
+      blockSize: Grootte poortblok
+    fields:
+      portsPerIp: Poorten per publiek IP
+      needed: Benodigde / beschikbare sessies
+      perIp: Abonnees per publiek IP
+      max: Maximaal aantal abonnees
+      ipsNeeded: Benodigde publieke IP's
+  wireless-link-calculator:
+    title: Point-to-point-straalverbindingcalculator
+    description: Linkbudget voor een radioverbinding — vrije-ruimteverlies, EIRP, ontvangstniveau en fademarge — plus de vrijgave van de Fresnelzone en de aardkromming die de masthoogte bepalen.
+    note: 'Vrije-ruimtemodel voor vrij zicht: regen, bladeren en multipath zijn niet meegenomen. Houd minstens 60 % van de eerste Fresnelzone vrij van obstakels; de aardkromming gebruikt k = 4/3 (standaardatmosfeer).'
+    grade:
+      good: 'Fademarge {margin} dB: een robuuste verbinding.'
+      ok: 'Fademarge {margin} dB: werkt, maar regen, storing of een verkeerde uitlijning kunnen hem laten wegvallen.'
+      poor: 'Fademarge {margin} dB: te weinig — gebruik antennes met meer gain, meer vermogen of een kortere afstand.'
+    inputs:
+      freqGHz: Frequentie (GHz)
+      distanceKm: Afstand (km)
+      txDbm: Zendvermogen (dBm)
+      txGainDbi: Gain zendantenne (dBi)
+      rxGainDbi: Gain ontvangstantenne (dBi)
+      cableLossDb: Kabelverlies per kant (dB)
+      sensitivityDbm: Ontvangergevoeligheid (dBm)
+    fields:
+      fspl: Vrije-ruimteverlies
+      rx: Ontvangen signaalniveau
+      margin: Fademarge
+      fresnel: Straal eerste Fresnelzone (midden)
+      clearance: Benodigde vrijgave (60 %)
+      bulge: Aardkromming (midden)
+      mast: Minimale hoogte boven obstakels
+  dscp-converter:
+    title: DSCP- / ToS- / CoS-omrekenaar
+    description: Reken om tussen DSCP-namen en -waarden, de ToS-byte, IP-precedence en 802.1p-CoS, met de RFC 4594-verkeersklasse en markeervoorbeelden voor Cisco, Juniper, Linux en MikroTik.
+    input: DSCP-naam of -waarde, ToS-byte, binair of precedence
+    invalid: 'Voer bijvoorbeeld EF, AF41, 46, 0xb8, "tos 184", 101110 of "prec 5" in.'
+    snippets: Markeervoorbeelden (SIP-signalering op UDP 5060 als voorbeeldmatch)
+    table: Alle per-hop behaviours
+    fields:
+      name: Per-hop behaviour
+      binary: Binair
+      tos: ToS-byte
+      precedence: IP-precedence
+      cos: 802.1p-CoS (gangbare mapping)
+      drop: Drop precedence
+      use: Typisch gebruik (RFC 4594)
+    drop:
+      low: laag (als laatste weggegooid)
+      medium: middel
+      high: hoog (als eerste weggegooid)
+    uses:
+      best-effort: Best effort / standaard
+      lower-effort: Lower effort (achtergrond)
+      scavenger: Scavenger / bulk
+      high-throughput: Data met hoge doorvoer
+      oam: Netwerkbeheer (OAM)
+      low-latency-data: Data met lage latency (transacties)
+      broadcast-video: Broadcastvideo
+      multimedia-streaming: Multimediastreaming
+      real-time-interactive: Realtime interactief
+      multimedia-conferencing: Videovergaderen
+      signaling: Gesprekssignalering
+      telephony: Spraak (telefonie)
+      network-control: Netwerkbesturing (routeringsprotocollen)
+      reserved: Gereserveerd / netwerkbesturing
+      unassigned: Niet toegewezen aan een standaard-PHB
+  dns-ttl-planner:
+    title: DNS-migratie- / TTL-planner
+    description: Plan een DNS-wijziging — wanneer de TTL omlaag moet, wanneer de overstap veilig is, wanneer hij overal zichtbaar is en wanneer de TTL weer omhoog kan — en zet de stappen in je agenda.
+    name: Record
+    fetch: Huidige TTL uitlezen
+    fetched: 'Huidige TTL uit publieke DNS: {ttl} s (een cache kan minder tonen dan de ingestelde waarde).'
+    noRecord: Geen A-record gevonden — vul de TTL zelf in.
+    ttl: Huidige TTL (s)
+    low: Tijdelijke lage TTL (s)
+    change: Moment van de wijziging
+    plan: Plan
+    when: Wanneer
+    what: Stap
+    worst: 'Na de wijziging tonen resolvers die TTL''s volgen het nieuwe record binnen {min} minuut/minuten. Sommige resolvers negeren TTL''s — laat het oude doel nog even werken.'
+    ics: Downloaden als agenda (.ics)
+    steps:
+      lower: 'Verlaag de TTL naar {low} s'
+      lowered: 'Alle caches houden het record nu hooguit {low} s vast'
+      change: Voer de wijziging uit
+      propagated: Wijziging zichtbaar voor resolvers die TTL's volgen
+      restore: 'Controleer, en zet de TTL daarna terug op {ttl} s'
+  tls-rpt-viewer:
+    title: TLS-RPT-rapportviewer
+    description: Open SMTP TLS-rapporten (RFC 8460, JSON of .gz) in je browser — slagingspercentage per rapporteur en welke MX-hosts falen op MTA-STS of DANE, en waarom.
+    upload: Rapportbestanden kiezen
+    note: 'Rapporten zijn de bestanden die Google, Microsoft en anderen sturen naar het adres in je _smtp._tls-TXT-record. Ze worden in je browser gelezen en nooit geüpload.'
+    unreadable: 'Geen TLS-RPT-rapport: {files}'
+    summary: '{n} rapport(en)'
+    allOk: 'Alle sessies waren versleuteld zoals je beleid vereist ({rate} %).'
+    someFail: '{failure} sessie(s) mislukt ({rate} % geslaagd) — zie de fouten hieronder.'
+    failures: Fouten
+    reports: Rapporten
+    types: 'Veelvoorkomende oorzaken: certificate-expired / -host-mismatch / -not-trusted (certificaat), starttls-not-supported, sts-policy-fetch-error of sts-webpki-invalid (MTA-STS-beleid), tlsa-invalid of dnssec-invalid (DANE).'
+    columns:
+      success: Geslaagde sessies
+      failure: Mislukte sessies
+      type: Resultaattype
+      sessions: Sessies
+      reporters: Gemeld door
+      org: Rapporteur
+      period: Periode
+      policy: Beleid
+  subnet-overlap-checker:
+    title: Subnetoverlapcontrole
+    description: Vind overlappende en dubbele prefixen tussen locaties, VPN-peers en cloudnetwerken voordat je ze koppelt — IPv4 en IPv6.
+    input: Prefixen
+    help: 'Eén prefix per regel, eventueel met een label ("10.0.0.0/16 kantoor" of "kantoor: 10.0.0.0/16"). Een regel "# Locatienaam" labelt de regels eronder. Alleen overlap tussen verschillende labels wordt gemeld, tenzij je dat aanzet.'
+    same: Ook overlap binnen één label melden
+    found: '{n} overlap(pen) tussen {total} prefixen.'
+    none: 'Geen overlap tussen {total} prefixen.'
+    invalid: 'Regels die geen prefix zijn: {lines}'
+    relations:
+      identical: is gelijk aan
+      contains: bevat
+    columns:
+      a: Prefix
+      b: Prefix
+      label: Label
+      relation: Relatie
+      lines: Regels

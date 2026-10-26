@@ -45,6 +45,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | IP-21 | IP address plan (IPAM sheet) | IPv4/IPv6 plan with names, VLANs, fixed networks, first-fit allocation, free blocks, CSV | B | custom | — | 6 | ✅ |
 | IP-22 | NAT64 / DNS64 check | DNS64 detection and NAT64 prefix discovery via ipv4only.arpa (RFC 7050 / 6052) | S | `miekg/dns` | — | 6 | ✅ |
 | IP-23 | Country IP blocks | IPv4/IPv6 blocks registered to a country, merged; prefix-list / ipset / address-list output | S | `netipx` | RIPEstat country-resource-list | 6 | ✅ |
+| IP-24 | Subnet overlap checker | Overlapping / duplicate prefixes between labelled groups (IPv4 / IPv6) | B | custom | — | 7 | ✅ |
 
 ## 2. DNS
 
@@ -68,6 +69,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | DNS-16 | Reverse DNS coverage | PTR + forward confirmation (FCrDNS) for a /24 or /120 | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-17 | HTTPS / SVCB & ECH viewer | RFC 9460 records, alias chasing, ECHConfigList decoding, DDR | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-18 | EDNS compliance test | ISC ednscomp-style tests per authoritative server | S | `miekg/dns` | — | 6 | ✅ |
+| DNS-19 | DNS migration / TTL planner | Lower / change / restore timeline from the current TTL, iCalendar export | H | `/api/v1/dns/lookup` (optional) | — | 7 | ✅ |
 
 ## 3. Connectivity & Diagnostics
 
@@ -147,6 +149,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | EM-08 | DMARC aggregate report viewer | Upload XML/zip/gz report → tables | B | `fflate` + XML parser | — | 4 | ✅ |
 | EM-09 | Open relay test | Opt-in, bounded relay test of own server | S | `net/smtp` (no DATA sent) | — | 4 | ✅ |
 | EM-10 | SMTP banner & FCrDNS | PTR, forward confirmation, banner and EHLO name vs PTR, STARTTLS | S | `miekg/dns`, `net/smtp`-style probe | — | 6 | ✅ |
+| EM-11 | TLS-RPT report viewer | RFC 8460 reports (JSON / gzip): success rate, failures by type and MX | B | `fflate` | — | 7 | ✅ |
 
 ## 7. Routing, BGP & Registry
 
@@ -213,6 +216,10 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CAL-14 | VoIP bandwidth & Erlang calculator | Per-call bandwidth incl. RTP/UDP/IP/SRTP/VLAN/L2 overhead, Erlang B trunk sizing | B | custom | — | 6 | ✅ |
 | CAL-15 | Packet decoder | Hex dump → Ethernet, VLAN, ARP, IPv4/IPv6, TCP, UDP, ICMP, DNS | B | custom | — | 6 | ✅ |
 | CAL-16 | Pcap viewer | pcap / pcapng in the browser: packets, filter, protocols, conversations, DNS queries | B | custom | — | 6 | ✅ |
+| CAL-17 | PoE budget calculator | Class-based or LLDP allocation per 802.3af/at/bt vs switch budget | B | custom | — | 7 | ✅ |
+| CAL-18 | NAT / PAT capacity calculator | CGNAT port blocks, subscribers per IP, IPs needed, deterministic NAT (RFC 7422) | B | custom | — | 7 | ✅ |
+| CAL-19 | Point-to-point wireless link | FSPL, EIRP, receive level, fade margin, Fresnel clearance, earth bulge | B | custom | — | 7 | ✅ |
+| CAL-20 | DSCP / ToS / CoS converter | DSCP ↔ ToS ↔ precedence ↔ 802.1p, RFC 4594 classes, marking snippets | B | custom | — | 7 | ✅ |
 
 ## 11. Client Diagnostics (runs in the user's browser)
 

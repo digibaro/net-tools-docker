@@ -3444,3 +3444,164 @@ tools:
       server: Server resolver
       pub: Public DNS (DoH, from your browser)
       verdict: Result
+  poe-budget-calculator:
+    title: PoE budget calculator
+    description: Does the switch's PoE budget cover all access points, cameras and phones? Class-based or LLDP-negotiated allocation per IEEE 802.3af/at/bt.
+    budget: Switch PoE budget (W)
+    devices: Devices (name, class, count, optional measured W)
+    help: 'One device type per line, e.g. "Access point, 4, 6". Class-based switches reserve the class maximum per port; with LLDP power negotiation only what the device asks for.'
+    over: The devices need more power than the switch can deliver — some ports will not power up.
+    fits: 'The budget is {pct} % allocated.'
+    classes: PoE classes
+    cls: Class
+    modes:
+      class: Class-based
+      lldp: LLDP-negotiated
+    fields:
+      ports: Powered ports
+      allocated: Allocated
+      drawn: Drawn by the devices
+      remaining: Remaining budget
+      pse: At switch (W)
+      pd: At device (W)
+  nat-capacity-calculator:
+    title: NAT / PAT capacity calculator
+    description: How many subscribers fit behind a set of public IPs with CGNAT port blocks, how many IPs you need, and which port block a subscriber gets (deterministic NAT, RFC 7422).
+    fits: 'Fits: the port blocks and the public addresses cover every subscriber.'
+    short: 'Does not fit: you need {ips} public IP(s) at this block size.'
+    deterministic: Deterministic NAT lookup
+    subscriber: Subscriber number (from 0)
+    slot: 'Public IP #{ip}, ports {from} – {to}'
+    noSlot: This subscriber number does not fit.
+    inputs:
+      subscribers: Subscribers
+      sessionsPerSubscriber: Sessions per subscriber
+      publicIps: Public IPv4 addresses
+      portLow: Lowest port
+      portHigh: Highest port
+      blockSize: Port block size
+    fields:
+      portsPerIp: Ports per public IP
+      needed: Sessions needed / available
+      perIp: Subscribers per public IP
+      max: Maximum subscribers
+      ipsNeeded: Public IPs needed
+  wireless-link-calculator:
+    title: Point-to-point wireless link calculator
+    description: Link budget for a radio link — free-space path loss, EIRP, receive level and fade margin — plus the Fresnel zone clearance and earth bulge that set the mast height.
+    note: 'Free-space model for a clear line of sight: rain, foliage and multipath are not included. Plan at least 60 % of the first Fresnel zone free of obstacles; the earth bulge uses k = 4/3 (standard atmosphere).'
+    grade:
+      good: 'Fade margin {margin} dB: a robust link.'
+      ok: 'Fade margin {margin} dB: works, but rain, interference or misalignment can drop it.'
+      poor: 'Fade margin {margin} dB: too little — use higher-gain antennas, more power or a shorter path.'
+    inputs:
+      freqGHz: Frequency (GHz)
+      distanceKm: Distance (km)
+      txDbm: Transmit power (dBm)
+      txGainDbi: TX antenna gain (dBi)
+      rxGainDbi: RX antenna gain (dBi)
+      cableLossDb: Cable loss per side (dB)
+      sensitivityDbm: Receiver sensitivity (dBm)
+    fields:
+      fspl: Free-space path loss
+      rx: Received signal level
+      margin: Fade margin
+      fresnel: First Fresnel zone radius (mid-path)
+      clearance: 60 % clearance needed
+      bulge: Earth bulge (mid-path)
+      mast: Minimum height above obstacles
+  dscp-converter:
+    title: DSCP / ToS / CoS converter
+    description: Convert between DSCP names and values, the ToS byte, IP precedence and 802.1p CoS, with the RFC 4594 traffic class and marking snippets for Cisco, Juniper, Linux and MikroTik.
+    input: DSCP name or value, ToS byte, binary or precedence
+    invalid: 'Enter for example EF, AF41, 46, 0xb8, "tos 184", 101110 or "prec 5".'
+    snippets: Marking examples (SIP signalling on UDP 5060 as example match)
+    table: All per-hop behaviours
+    fields:
+      name: Per-hop behaviour
+      binary: Binary
+      tos: ToS byte
+      precedence: IP precedence
+      cos: 802.1p CoS (common mapping)
+      drop: Drop precedence
+      use: Typical use (RFC 4594)
+    drop:
+      low: low (dropped last)
+      medium: medium
+      high: high (dropped first)
+    uses:
+      best-effort: Best effort / default
+      lower-effort: Lower effort (background)
+      scavenger: Scavenger / bulk
+      high-throughput: High-throughput data
+      oam: Network management (OAM)
+      low-latency-data: Low-latency data (transactions)
+      broadcast-video: Broadcast video
+      multimedia-streaming: Multimedia streaming
+      real-time-interactive: Real-time interactive
+      multimedia-conferencing: Video conferencing
+      signaling: Call signalling
+      telephony: Voice (telephony)
+      network-control: Network control (routing protocols)
+      reserved: Reserved / network control
+      unassigned: Not assigned to a standard PHB
+  dns-ttl-planner:
+    title: DNS migration / TTL planner
+    description: Plan a DNS change — when to lower the TTL, when the switch is safe, when it is visible everywhere and when to raise the TTL again — and add the steps to your calendar.
+    name: Record
+    fetch: Read the current TTL
+    fetched: 'Current TTL read from public DNS: {ttl} s (a cache may show less than the configured value).'
+    noRecord: No A record found — enter the TTL yourself.
+    ttl: Current TTL (s)
+    low: Temporary low TTL (s)
+    change: Moment of the change
+    plan: Plan
+    when: When
+    what: Step
+    worst: 'After the change, resolvers that follow TTLs show the new record within {min} minute(s). Some resolvers ignore TTLs — keep the old target working a little longer.'
+    ics: Download as calendar (.ics)
+    steps:
+      lower: 'Lower the TTL to {low} s'
+      lowered: 'All caches now hold the record for at most {low} s'
+      change: Make the change
+      propagated: Change visible for resolvers that follow TTLs
+      restore: 'Check, then raise the TTL back to {ttl} s'
+  tls-rpt-viewer:
+    title: TLS-RPT report viewer
+    description: Open SMTP TLS reports (RFC 8460, JSON or .gz) in your browser — success rate per reporter and which MX hosts fail MTA-STS or DANE, and why.
+    upload: Choose report files
+    note: 'Reports are the files that Google, Microsoft and others send to the address in your _smtp._tls TXT record. They are read in your browser and never uploaded.'
+    unreadable: 'Not a TLS-RPT report: {files}'
+    summary: '{n} report(s)'
+    allOk: 'All sessions were encrypted as your policy requires ({rate} %).'
+    someFail: '{failure} session(s) failed ({rate} % successful) — see the failures below.'
+    failures: Failures
+    reports: Reports
+    types: 'Common causes: certificate-expired / -host-mismatch / -not-trusted (certificate), starttls-not-supported, sts-policy-fetch-error or sts-webpki-invalid (MTA-STS policy), tlsa-invalid or dnssec-invalid (DANE).'
+    columns:
+      success: Successful sessions
+      failure: Failed sessions
+      type: Result type
+      sessions: Sessions
+      reporters: Reported by
+      org: Reporter
+      period: Period
+      policy: Policy
+  subnet-overlap-checker:
+    title: Subnet overlap checker
+    description: Find overlapping and duplicate prefixes between sites, VPN peers and cloud networks before you connect them — IPv4 and IPv6.
+    input: Prefixes
+    help: 'One prefix per line, optionally with a label ("10.0.0.0/16 office" or "office: 10.0.0.0/16"). A line "# Site name" labels the lines below it. Only overlaps between different labels are reported, unless you switch that on.'
+    same: Also report overlaps within one label
+    found: '{n} overlap(s) among {total} prefixes.'
+    none: 'No overlaps among {total} prefixes.'
+    invalid: 'Lines that are not a prefix: {lines}'
+    relations:
+      identical: is the same as
+      contains: contains
+    columns:
+      a: Prefix
+      b: Prefix
+      label: Label
+      relation: Relation
+      lines: Lines

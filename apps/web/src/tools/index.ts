@@ -42,9 +42,11 @@ import { tool as dnsPropagation } from './dns-propagation'
 import { tool as dnsProxyCheck } from './dns-proxy-check'
 import { tool as dnsRecordTypes } from './dns-record-types'
 import { tool as dnsTrace } from './dns-trace'
+import { tool as dnsTtlPlanner } from './dns-ttl-planner'
 import { tool as dnssecValidator } from './dnssec-validator'
 import { tool as domainExpiry } from './domain-expiry'
 import { tool as domainParser } from './domain-parser'
+import { tool as dscpConverter } from './dscp-converter'
 import { tool as ednsCompliance } from './edns-compliance'
 import { tool as emailHeaderAnalyzer } from './email-header-analyzer'
 import { tool as encryptedDnsTester } from './encrypted-dns-tester'
@@ -87,6 +89,7 @@ import { tool as mtr } from './mtr'
 import { tool as mtuCalculator } from './mtu-calculator'
 import { tool as mxLookup } from './mx-lookup'
 import { tool as nat64Dns64Check } from './nat64-dns64-check'
+import { tool as natCapacityCalculator } from './nat-capacity-calculator'
 import { tool as ntpCheck } from './ntp-check'
 import { tool as openRelayTest } from './open-relay-test'
 import { tool as openResolverTest } from './open-resolver-test'
@@ -98,6 +101,7 @@ import { tool as pcapViewer } from './pcap-viewer'
 import { tool as peeringdbLookup } from './peeringdb-lookup'
 import { tool as ping } from './ping'
 import { tool as pkcs12Inspector } from './pkcs12-inspector'
+import { tool as poeBudgetCalculator } from './poe-budget-calculator'
 import { tool as portCheck } from './port-check'
 import { tool as portReference } from './port-reference'
 import { tool as portScanner } from './port-scanner'
@@ -126,11 +130,13 @@ import { tool as ssdpDiscovery } from './ssdp-discovery'
 import { tool as sshAudit } from './ssh-audit'
 import { tool as starttlsCheck } from './starttls-check'
 import { tool as subnetCheatSheet } from './subnet-cheat-sheet'
+import { tool as subnetOverlapChecker } from './subnet-overlap-checker'
 import { tool as subnetSplitter } from './subnet-splitter'
 import { tool as svcbHttpsViewer } from './svcb-https-viewer'
 import { tool as tcpPing } from './tcp-ping'
 import { tool as tlsExpiry } from './tls-expiry'
 import { tool as tlsInspector } from './tls-inspector'
+import { tool as tlsRptViewer } from './tls-rpt-viewer'
 import { tool as tlsScanner } from './tls-scanner'
 import { tool as torExitCheck } from './tor-exit-check'
 import { tool as traceroute } from './traceroute'
@@ -149,21 +155,22 @@ import { tool as wifiQrGenerator } from './wifi-qr-generator'
 import { tool as wildcardDetector } from './wildcard-detector'
 import { tool as wildcardMaskCalculator } from './wildcard-mask-calculator'
 import { tool as wireguardConfig } from './wireguard-config'
+import { tool as wirelessLinkCalculator } from './wireless-link-calculator'
 import { tool as zoneBuilder } from './zone-builder'
 import { tool as zoneTransferTest } from './zone-transfer-test'
 
 // Category order matches docs/TOOLS_CATALOG.md. Empty categories are hidden.
 const categories: { id: string, components: Tool[] }[] = [
-  { id: 'ip', components: [ipv4SubnetCalculator, ipv6SubnetCalculator, cidrRangeConverter, cidrAggregator, subnetSplitter, ipInSubnet, ipv4FormatConverter, ipv6ExpandCompress, ipv6UlaGenerator, ipSpecialCheck, wildcardMaskCalculator, reverseDnsName, macAddressLookup, macFormatter, eui64Calculator, whatIsMyIp, vlsmPlanner, ipv4InIpv6, randomIpGenerator, ipv6AddressAnalyzer, ipamSheet, nat64Dns64Check, countryIpBlocks] },
-  { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance] },
+  { id: 'ip', components: [ipv4SubnetCalculator, ipv6SubnetCalculator, cidrRangeConverter, cidrAggregator, subnetSplitter, ipInSubnet, ipv4FormatConverter, ipv6ExpandCompress, ipv6UlaGenerator, ipSpecialCheck, wildcardMaskCalculator, reverseDnsName, macAddressLookup, macFormatter, eui64Calculator, whatIsMyIp, vlsmPlanner, ipv4InIpv6, randomIpGenerator, ipv6AddressAnalyzer, ipamSheet, nat64Dns64Check, countryIpBlocks, subnetOverlapChecker] },
+  { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance, dnsTtlPlanner] },
   { id: 'connectivity', components: [ping, tcpPing, traceroute, mtr, portCheck, ntpCheck, serverNetworkInfo, isItDown, latencyMatrix, pathMtu, ipv6Readiness, portScanner, iperf, snmp] },
   { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder] },
   { id: 'tls', components: [certificateDecoder, tlsInspector, tlsExpiry, csrTool, certKeyMatcher, ctSearch, starttlsCheck, revocationCheck, tlsScanner, sshAudit, keyConverter, daneChecker, certChainValidator, pkcs12Inspector, labCaGenerator] },
-  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck] },
+  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer] },
   { id: 'bgp', components: [ipToAsn, whoisLookup, rdapLookup, domainExpiry, asnInfo, prefixStatus, rpkiValidator, lookingGlass, peeringdbLookup, cloudIpLookup, irrExpansion, asPathVisualizer, bgpRouteHistory, asnNeighbourGraph, commonIxps, roaCoverage] },
   { id: 'reputation', components: [ipGeolocation, passiveExposure, ipReputation, torExitCheck, urlReputation] },
   { id: 'lan', components: [wakeOnLan, arpScan, mdnsBrowser, ssdpDiscovery, dhcpProbe, gatewayInfo, lldpNeighbors, ipv6Neighbors, dhcpv6Probe] },
-  { id: 'calculators', components: [bandwidthCalculator, dataUnitConverter, bdpCalculator, mtuCalculator, portReference, protocolReference, dnsRecordTypes, subnetCheatSheet, wifiQrGenerator, opticalPower, wireguardConfig, routerSnippets, slaCalculator, voipBandwidthCalculator, packetDecoder, pcapViewer] },
+  { id: 'calculators', components: [bandwidthCalculator, dataUnitConverter, bdpCalculator, mtuCalculator, portReference, protocolReference, dnsRecordTypes, subnetCheatSheet, wifiQrGenerator, opticalPower, wireguardConfig, routerSnippets, slaCalculator, voipBandwidthCalculator, packetDecoder, pcapViewer, poeBudgetCalculator, natCapacityCalculator, wirelessLinkCalculator, dscpConverter] },
   { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, webrtcLeakTest, speedTest, dnsProxyCheck] },
 ]
 
