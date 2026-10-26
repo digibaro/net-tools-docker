@@ -89,6 +89,46 @@ paths:
                     properties:
                       data: { $ref: "#/components/schemas/Capabilities" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/auth/login:
+    get:
+      operationId: authLogin
+      summary: Start the OIDC login (only when AUTH_MODE=oidc); redirects to the identity provider
+      tags: [system]
+      parameters:
+        - { name: next, in: query, description: in-app path to return to, schema: { type: string } }
+      responses:
+        "302": { description: Redirect to the identity provider, or to /?auth_error=<code> }
+  /v1/auth/callback:
+    get:
+      operationId: authCallback
+      summary: OIDC redirect URI; sets the session cookie and redirects to next
+      tags: [system]
+      parameters:
+        - { name: code, in: query, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
+      responses:
+        "302": { description: "Redirect to next, or to /?auth_error=<state|exchange|token|not_allowed|denied|idp_unreachable>" }
+  /v1/auth/logout:
+    post:
+      operationId: authLogout
+      summary: Clear the session cookie; returns the identity provider's end-session URL when it has one
+      tags: [system]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data:
+                        type: object
+                        required: [logoutUrl]
+                        properties:
+                          logoutUrl: { type: string }
   /v1/echo:
     get:
       operationId: getEcho
@@ -2242,6 +2282,8 @@ components:
         - INTERNAL
         - NOT_FOUND
         - METHOD_NOT_ALLOWED
+        - UNAUTHENTICATED
+        - FORBIDDEN
     Version:
       type: object
       required: [version, commit, buildDate, goVersion]
@@ -2252,8 +2294,23 @@ components:
         goVersion: { type: string }
     Capabilities:
       type: object
-      required: [mode, tools, limits]
+      required: [mode, tools, limits, auth]
       properties:
+        auth:
+          type: object
+          required: [mode, user]
+          description: AUTH_MODE and the signed-in user (from the session cookie; null when anonymous or auth is off)
+          properties:
+            mode: { type: string, enum: ["off", oidc] }
+            user:
+              oneOf:
+                - type: "null"
+                - type: object
+                  required: [name, role]
+                  properties:
+                    name: { type: string }
+                    email: { type: string }
+                    role: { type: string, enum: [user, admin] }
         mode:
           type: object
           required: [profile, allowPrivateTargets, lan]
@@ -2283,7 +2340,7 @@ components:
         enabled: { type: boolean }
         reason:
           type: string
-          enum: [disabled_by_admin, provider_key_missing, requires_lan_mode, binary_missing, data_missing]
+          enum: [disabled_by_admin, provider_key_missing, requires_lan_mode, binary_missing, data_missing, login_required, forbidden_role]
     Echo:
       type: object
       required: [ip, family, protocol, scheme, method, userAgent, headers]

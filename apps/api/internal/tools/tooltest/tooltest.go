@@ -12,6 +12,7 @@ import (
 	"net/netip"
 	"testing"
 
+	"github.com/digibaro/net-tools-docker/apps/api/internal/auth"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/config"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/execx"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/httpapi"
@@ -40,6 +41,8 @@ type Options struct {
 	Deny []string
 	// Providers lets a test share (and inspect) the provider client.
 	Providers *providers.Client
+	// Auth lets a test issue sessions for the router's auth service.
+	Auth *auth.Service
 }
 
 // Config loads a test configuration (relaxed rate limits) with overrides.
@@ -75,6 +78,7 @@ func New(t testing.TB, tool tools.Tool, o Options) *Env {
 		Target:    res,
 		Exec:      o.Exec,
 		Providers: o.Providers,
+		Auth:      o.Auth,
 	})
 	return &Env{t: t, Handler: h}
 }

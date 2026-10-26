@@ -201,3 +201,27 @@ func TestInlineCommentValuesAreUnset(t *testing.T) {
 		t.Errorf("secrets = %v", cfg.Features.ProviderSecrets)
 	}
 }
+
+func TestAuth(t *testing.T) {
+	load := func(env map[string]string) (Config, error) {
+		return LoadFrom(func(k string) (string, bool) { v, ok := env[k]; return v, ok }, func(string) ([]byte, error) { return []byte("file-secret-0123456789abcdef0123456789"), nil })
+	}
+	cfg, err := load(map[string]string{})
+	if err != nil || cfg.Auth.Enabled() || cfg.Auth.RedirectURL != "http://localhost:8080/api/v1/auth/callback" {
+		t.Fatalf("default: %+v %v", cfg.Auth, err)
+	}
+	cfg, err = load(map[string]string{"AUTH_MODE": "oidc", "OIDC_ISSUER": "https://id.example", "OIDC_CLIENT_ID": "nt", "SESSION_SECRET_FILE": "/run/secrets/s", "OIDC_SCOPES": "profile,email", "OIDC_ADMIN_GROUPS": "netadmins, noc"})
+	if err != nil || !cfg.Auth.Enabled() || cfg.Auth.Scopes[0] != "openid" || len(cfg.Auth.AdminGroups) != 2 || cfg.Auth.SessionSecret == "" {
+		t.Fatalf("oidc: %+v %v", cfg.Auth, err)
+	}
+	for _, env := range []map[string]string{
+		{"AUTH_MODE": "oidc", "OIDC_ISSUER": "https://id.example", "OIDC_CLIENT_ID": "nt", "SESSION_SECRET": "short"},
+		{"AUTH_MODE": "oidc", "SESSION_SECRET": strings.Repeat("x", 40)},
+		{"AUTH_MODE": "basic"},
+		{"AUTH_ANONYMOUS_ROLE": "admin"},
+	} {
+		if _, err := load(env); err == nil {
+			t.Errorf("%v: want error", env)
+		}
+	}
+}

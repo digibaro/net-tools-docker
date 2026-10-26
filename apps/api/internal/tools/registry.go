@@ -25,6 +25,10 @@ const (
 	ReasonRequiresLANMode    Reason = "requires_lan_mode"
 	ReasonBinaryMissing      Reason = "binary_missing"
 	ReasonDataMissing        Reason = "data_missing"
+	// ReasonLoginRequired: AUTH_MODE=oidc and the visitor has not signed in.
+	ReasonLoginRequired Reason = "login_required"
+	// ReasonForbiddenRole: signed in, but the tool is in AUTH_ADMIN_TOOLS.
+	ReasonForbiddenRole Reason = "forbidden_role"
 )
 
 // Middleware is a standard net/http middleware.

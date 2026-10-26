@@ -16,6 +16,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/digibaro/net-tools-docker/apps/api/internal/auth"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/config"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/execx"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/limits"
@@ -56,6 +57,8 @@ type Options struct {
 	Pool    *limits.Pool
 	// Providers defaults to a new client (tests pass one to inspect it).
 	Providers *providers.Client
+	// Auth defaults to auth.New(Config); nil when AUTH_MODE=off.
+	Auth *auth.Service
 }
 
 // BuildDeps fills defaults and returns the dependencies handed to tools.
@@ -92,7 +95,7 @@ func BuildDeps(o *Options) tools.Deps {
 		RateLimit: func(c limits.Class) tools.Middleware {
 			return limiter.Middleware(c, func(r *http.Request) netip.Addr { return middleware.GetClientIP(r.Context()) },
 				func(w http.ResponseWriter, r *http.Request) {
-					rejectLimited(w, r, &APIError{Code: CodeRateLimited, Message: "too many requests, please wait", Details: retryDetails(w)})
+					rejectStreamAware(w, r, &APIError{Code: CodeRateLimited, Message: "too many requests, please wait", Details: retryDetails(w)})
 				})
 		},
 		Timeout:   limits.Timeout,
@@ -102,7 +105,7 @@ func BuildDeps(o *Options) tools.Deps {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				release, err := pool.Acquire(middleware.GetClientIP(r.Context()))
 				if err != nil {
-					rejectLimited(w, r, err)
+					rejectStreamAware(w, r, err)
 					return
 				}
 				defer release()
@@ -115,6 +118,10 @@ func BuildDeps(o *Options) tools.Deps {
 // NewRouter builds the API handler. All routes live under /api.
 func NewRouter(o Options) http.Handler {
 	deps := BuildDeps(&o)
+	if o.Auth == nil {
+		o.Auth = auth.New(o.Config, o.Logger)
+	}
+	authz := o.Auth
 	r := chi.NewRouter()
 	r.Use(
 		middleware.RequestID(o.Logger),
@@ -137,8 +144,16 @@ func NewRouter(o Options) http.Handler {
 		r.Get("/readyz", handleReadyz(o.Ready))
 
 		r.Route("/v1", func(r chi.Router) {
+			r.Use(authz.SameOrigin)
 			r.Get("/version", handleVersion(o.Build))
-			r.Get("/capabilities", handleCapabilities(deps, o.Tools))
+			r.Get("/capabilities", handleCapabilities(deps, o.Tools, authz))
+			if authz != nil {
+				r.Get("/auth/login", authz.Login)
+				r.Get("/auth/callback", authz.Callback)
+				r.Post("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
+					JSON(w, r, map[string]string{"logoutUrl": authz.Logout(w, r)}, nil)
+				})
+			}
 			r.Get("/echo", handleEcho(o.Config.Features.TrustedProxies))
 
 			auditIP := ipFormatter(o.Config.Features.LogHashIPs)
@@ -146,13 +161,18 @@ func NewRouter(o Options) http.Handler {
 				if ok, _ := t.Enabled(deps); !ok {
 					continue
 				}
-				if !o.Config.Features.AuditLog {
+				if !o.Config.Features.AuditLog && authz == nil {
 					t.Mount(r, deps)
 					continue
 				}
-				// AUDIT_LOG: every route of the tool gets the audit middleware.
 				r.Group(func(g chi.Router) {
-					g.Use(middleware.Audit(t.ID(), auditIP))
+					if authz != nil {
+						g.Use(authz.Require(t.ID(), denyAuth))
+					}
+					// AUDIT_LOG: every route of the tool gets the audit middleware.
+					if o.Config.Features.AuditLog {
+						g.Use(middleware.Audit(t.ID(), auditIP))
+					}
 					t.Mount(g, deps)
 				})
 			}
@@ -196,6 +216,28 @@ type CapabilitiesData struct {
 	Mode   ModeInfo                    `json:"mode"`
 	Tools  map[string]tools.Capability `json:"tools"`
 	Limits LimitsInfo                  `json:"limits"`
+	Auth   AuthInfo                    `json:"auth"`
+}
+
+// AuthInfo tells the UI whether login exists and who is signed in.
+type AuthInfo struct {
+	Mode string    `json:"mode"` // off | oidc
+	User *AuthUser `json:"user"`
+}
+
+// AuthUser is the signed-in user (from the session cookie).
+type AuthUser struct {
+	Name  string `json:"name"`
+	Email string `json:"email,omitempty"`
+	Role  string `json:"role"`
+}
+
+func denyAuth(w http.ResponseWriter, r *http.Request, reason tools.Reason) {
+	if reason == tools.ReasonForbiddenRole {
+		rejectStreamAware(w, r, NewError(CodeForbidden, "this tool is limited to administrators"))
+		return
+	}
+	rejectStreamAware(w, r, NewError(CodeUnauthenticated, "sign in to use this tool"))
 }
 
 // ModeInfo describes the deployment mode.
@@ -217,9 +259,9 @@ type LimitsInfo struct {
 	MonitorMaxMinutes int   `json:"monitorMaxMinutes"`
 }
 
-func handleCapabilities(deps tools.Deps, all []tools.Tool) http.HandlerFunc {
+func handleCapabilities(deps tools.Deps, all []tools.Tool, authz *auth.Service) http.HandlerFunc {
 	cfg := deps.Config
-	data := CapabilitiesData{
+	base := CapabilitiesData{
 		Mode: ModeInfo{
 			Profile:             cfg.Profile,
 			AllowPrivateTargets: cfg.Features.AllowPrivate,
@@ -236,8 +278,29 @@ func handleCapabilities(deps tools.Deps, all []tools.Tool) http.HandlerFunc {
 			BulkMaxTargets:    cfg.Limits.BulkMaxTargets,
 			MonitorMaxMinutes: cfg.Limits.MonitorMaxMinutes,
 		},
+		Auth: AuthInfo{Mode: cfg.Auth.Mode},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		if authz == nil {
+			JSON(w, r, base, nil)
+			return
+		}
+		// Per visitor: tools the role may not use are reported as disabled with the reason.
+		data := base
+		data.Tools = make(map[string]tools.Capability, len(base.Tools))
+		for id, c := range base.Tools {
+			if c.Enabled {
+				if ok, reason := authz.Check(r, id); !ok {
+					c = tools.Capability{Enabled: false, Reason: reason}
+				}
+			}
+			data.Tools[id] = c
+		}
+		if u := authz.User(r); u != nil {
+			data.Auth.User = &AuthUser{Name: u.Name, Email: u.Email, Role: u.Role}
+		}
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Vary", "Cookie")
 		JSON(w, r, data, nil)
 	}
 }
@@ -272,9 +335,9 @@ func retryDetails(w http.ResponseWriter) map[string]any {
 	return nil
 }
 
-// rejectLimited writes a rate-limit / busy rejection. EventSource cannot read the body of a
+// rejectStreamAware writes a rate-limit / busy / auth rejection. EventSource cannot read the body of a
 // non-200 response, so streaming requests get the error as an SSE "error" event instead.
-func rejectLimited(w http.ResponseWriter, r *http.Request, err error) {
+func rejectStreamAware(w http.ResponseWriter, r *http.Request, err error) {
 	if !strings.Contains(r.Header.Get("Accept"), "text/event-stream") {
 		Error(w, r, err)
 		return

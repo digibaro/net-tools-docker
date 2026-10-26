@@ -72,6 +72,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Start the OIDC login (only when AUTH_MODE=oidc); redirects to the identity provider */
+        get: operations["authLogin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** OIDC redirect URI; sets the session cookie and redirects to next */
+        get: operations["authCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear the session cookie; returns the identity provider's end-session URL when it has one */
+        post: operations["authLogout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/echo": {
         parameters: {
             query?: never;
@@ -1851,7 +1902,7 @@ export interface components {
             };
         };
         /** @enum {string} */
-        ErrorCode: "INVALID_INPUT" | "TARGET_UNRESOLVABLE" | "TARGET_PRIVATE_DENIED" | "TARGET_BLOCKED" | "TOOL_DISABLED" | "PROVIDER_KEY_MISSING" | "TIMEOUT" | "RATE_LIMITED" | "BUSY" | "PROVIDER_ERROR" | "INTERNAL" | "NOT_FOUND" | "METHOD_NOT_ALLOWED";
+        ErrorCode: "INVALID_INPUT" | "TARGET_UNRESOLVABLE" | "TARGET_PRIVATE_DENIED" | "TARGET_BLOCKED" | "TOOL_DISABLED" | "PROVIDER_KEY_MISSING" | "TIMEOUT" | "RATE_LIMITED" | "BUSY" | "PROVIDER_ERROR" | "INTERNAL" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNAUTHENTICATED" | "FORBIDDEN";
         Version: {
             version: string;
             commit: string;
@@ -1859,6 +1910,17 @@ export interface components {
             goVersion: string;
         };
         Capabilities: {
+            /** @description AUTH_MODE and the signed-in user (from the session cookie; null when anonymous or auth is off) */
+            auth: {
+                /** @enum {string} */
+                mode: "off" | "oidc";
+                user: null | {
+                    name: string;
+                    email?: string;
+                    /** @enum {string} */
+                    role: "user" | "admin";
+                };
+            };
             mode: {
                 /** @enum {string} */
                 profile: "public" | "internal" | "homelab";
@@ -1882,7 +1944,7 @@ export interface components {
         Capability: {
             enabled: boolean;
             /** @enum {string} */
-            reason?: "disabled_by_admin" | "provider_key_missing" | "requires_lan_mode" | "binary_missing" | "data_missing";
+            reason?: "disabled_by_admin" | "provider_key_missing" | "requires_lan_mode" | "binary_missing" | "data_missing" | "login_required" | "forbidden_role";
         };
         Echo: {
             ip: string;
@@ -3852,6 +3914,72 @@ export interface operations {
                 };
             };
             default: components["responses"]["Error"];
+        };
+    };
+    authLogin: {
+        parameters: {
+            query?: {
+                /** @description in-app path to return to */
+                next?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to the identity provider */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    authCallback: {
+        parameters: {
+            query?: {
+                code?: string;
+                state?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to next, or to /?auth_error=<state|exchange|token|not_allowed|denied|idp_unreachable> */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    authLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkEnvelope"] & {
+                        data: {
+                            logoutUrl: string;
+                        };
+                    };
+                };
+            };
         };
     };
     getEcho: {
