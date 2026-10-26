@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/netip"
+	"strings"
 	"testing"
 	"time"
 )
@@ -95,5 +96,19 @@ func TestTimeout(t *testing.T) {
 	h.ServeHTTP(httptest.NewRecorder(), httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
 	if deadline.IsZero() || time.Since(start) > time.Second {
 		t.Errorf("deadline=%v elapsed=%s", deadline, time.Since(start))
+	}
+}
+
+func TestRateLimitHeaders(t *testing.T) {
+	l := NewRateLimiter(60, 6) // heavy burst = 3
+	h := l.Middleware(Heavy, func(*http.Request) netip.Addr { return netip.MustParseAddr("192.0.2.1") }, func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusTooManyRequests) })(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	var got []string
+	for range 4 {
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/", nil))
+		got = append(got, rec.Header().Get("X-RateLimit-Remaining")+"/"+rec.Header().Get("Retry-After"))
+	}
+	if strings.Join(got, " ") != "2/ 1/ 0/ 0/10" || l.rpm[Heavy] != 6 {
+		t.Errorf("got %v", got)
 	}
 }

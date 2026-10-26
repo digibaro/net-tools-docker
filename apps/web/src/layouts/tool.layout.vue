@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import FavoriteButton from '@/components/FavoriteButton.vue'
 import RunModeBadge from '@/components/RunModeBadge.vue'
 import ToolDisabled from '@/components/ToolDisabled.vue'
+import { lowBudget, rateBudget } from '@/api/ratelimit'
 import { useCapabilitiesStore } from '@/stores/capabilities.store'
 
 const props = defineProps<{ tool: Tool }>()
@@ -15,6 +16,7 @@ const reason = computed(() => caps.reasonFor(props.tool))
 const { t } = useI18n()
 // The browser's print dialog also saves as PDF; the print stylesheet in App.vue hides the chrome.
 const print = () => window.print()
+const heavyLeft = computed(() => (props.tool.runMode === 'browser' ? undefined : lowBudget(rateBudget.heavy)))
 </script>
 
 <template>
@@ -42,6 +44,9 @@ const print = () => window.print()
         {{ tool.description }}
       </p>
     </header>
+    <p v-if="heavyLeft !== undefined" class="nt-muted mb-3 mt-0 text-xs nt-no-print" data-testid="rate-hint">
+      {{ t('apiErrors.budget', { n: heavyLeft, limit: rateBudget.heavy?.limit }) }}
+    </p>
     <ToolDisabled v-if="reason" :reason="reason" />
     <slot />
   </div>

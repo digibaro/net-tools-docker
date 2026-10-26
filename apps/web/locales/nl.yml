@@ -78,6 +78,9 @@ capabilities:
     api_unreachable: De NET-TOOLS-server is niet bereikbaar. Browsertools werken nog wel.
     unavailable: Niet beschikbaar op deze server.
 apiErrors:
+  retryIn: 'Je kunt het over {s} s opnieuw proberen.'
+  retryNow: Je kunt het nu opnieuw proberen.
+  budget: 'Nog {n} van {limit} zware requests deze minuut (scans, streams en providerlookups delen deze limiet).'
   INVALID_INPUT: Ongeldige invoer
   TARGET_UNRESOLVABLE: Doel kon niet worden opgezocht
   TARGET_PRIVATE_DENIED: Privé- en interne doelen zijn op deze server niet toegestaan

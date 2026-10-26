@@ -4,10 +4,14 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/netip"
 	"slices"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -83,7 +87,7 @@ func BuildDeps(o *Options) tools.Deps {
 		RateLimit: func(c limits.Class) tools.Middleware {
 			return limiter.Middleware(c, func(r *http.Request) netip.Addr { return middleware.GetClientIP(r.Context()) },
 				func(w http.ResponseWriter, r *http.Request) {
-					Error(w, r, NewError(CodeRateLimited, "too many requests, please wait"))
+					rejectLimited(w, r, &APIError{Code: CodeRateLimited, Message: "too many requests, please wait", Details: retryDetails(w)})
 				})
 		},
 		Timeout:   limits.Timeout,
@@ -93,7 +97,7 @@ func BuildDeps(o *Options) tools.Deps {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				release, err := pool.Acquire(middleware.GetClientIP(r.Context()))
 				if err != nil {
-					Error(w, r, err)
+					rejectLimited(w, r, err)
 					return
 				}
 				defer release()
@@ -253,4 +257,27 @@ func ipFormatter(hash bool) func(string) string {
 		sum := sha256.Sum256([]byte(s))
 		return hex.EncodeToString(sum[:8])
 	}
+}
+
+// retryDetails exposes Retry-After (set by the limiter) in the error details for the UI.
+func retryDetails(w http.ResponseWriter) map[string]any {
+	if n, err := strconv.Atoi(w.Header().Get("Retry-After")); err == nil {
+		return map[string]any{"retryAfter": n}
+	}
+	return nil
+}
+
+// rejectLimited writes a rate-limit / busy rejection. EventSource cannot read the body of a
+// non-200 response, so streaming requests get the error as an SSE "error" event instead.
+func rejectLimited(w http.ResponseWriter, r *http.Request, err error) {
+	if !strings.Contains(r.Header.Get("Accept"), "text/event-stream") {
+		Error(w, r, err)
+		return
+	}
+	a := ToAPIError(err)
+	body, _ := json.Marshal(map[string]any{"code": a.Code, "message": a.Message, "details": a.Details})
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
+	_, _ = fmt.Fprintf(w, "retry: 86400000\nevent: error\ndata: %s\n\n", body)
 }

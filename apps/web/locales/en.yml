@@ -78,6 +78,9 @@ capabilities:
     api_unreachable: The NET-TOOLS server cannot be reached. Browser-only tools still work.
     unavailable: Not available on this server.
 apiErrors:
+  retryIn: 'You can try again in {s} s.'
+  retryNow: You can try again now.
+  budget: '{n} of {limit} heavy requests left this minute (scans, streams and provider lookups share this limit).'
   INVALID_INPUT: Invalid input
   TARGET_UNRESOLVABLE: Target could not be resolved
   TARGET_PRIVATE_DENIED: Private and internal targets are not allowed on this server

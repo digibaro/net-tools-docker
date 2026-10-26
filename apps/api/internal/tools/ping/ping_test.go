@@ -2,6 +2,8 @@ package ping
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"net/netip"
 	"strings"
 	"testing"
@@ -100,5 +102,24 @@ func TestMonitor(t *testing.T) {
 	}
 	if b := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{}).Get("/api/v1/ping/monitor/stream?target=10.0.0.1").Raw.Body.String(); !strings.Contains(b, "TARGET_PRIVATE_DENIED") {
 		t.Errorf("ssrf: %s", b)
+	}
+}
+
+// Over the limit, a stream request gets the error as an SSE event (EventSource cannot read a 429
+// body) and a JSON request the usual envelope; both carry retryAfter.
+func TestRateLimitedStream(t *testing.T) {
+	engine, _, _ := fake(nil)
+	env := tooltest.New(t, &Tool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("93.184.215.14"), Env: map[string]string{"RATE_LIMIT_HEAVY_RPM": "6"}})
+	var last *httptest.ResponseRecorder
+	for range 4 {
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/v1/ping/stream?target=example.com&count=1", nil)
+		req.Header.Set("Accept", "text/event-stream")
+		last = env.Do(req).Raw
+	}
+	if last.Code != http.StatusOK || !strings.Contains(last.Body.String(), "event: error") || !strings.Contains(last.Body.String(), `"code":"RATE_LIMITED"`) || !strings.Contains(last.Body.String(), `"retryAfter":`) {
+		t.Fatalf("sse: %d %s", last.Code, last.Body.String())
+	}
+	if r := env.Get("/api/v1/ping/stream?target=example.com"); r.Status != http.StatusTooManyRequests || r.Raw.Header().Get("X-RateLimit-Remaining") != "0" {
+		t.Errorf("json: %d %s", r.Status, r.Raw.Body.String())
 	}
 }

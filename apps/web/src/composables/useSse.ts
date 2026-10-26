@@ -53,8 +53,8 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
           close()
         }
         else if (name === 'error') {
-          const e = (data ?? {}) as { code?: string, message?: string }
-          error.value = new ApiError((e.code ?? 'INTERNAL') as ApiError['code'], e.message ?? 'Stream error')
+          const e = (data ?? {}) as { code?: string, message?: string, details?: Record<string, unknown> }
+          error.value = new ApiError((e.code ?? 'INTERNAL') as ApiError['code'], e.message ?? 'Stream error', 0, e.details ?? {})
           status.value = 'error'
           close()
         }
