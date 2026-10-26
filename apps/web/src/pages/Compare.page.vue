@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowsLeftRight } from '@vicons/tabler'
-import { NButton, NEmpty, NIcon } from 'naive-ui'
+import { NButton, NIcon } from 'naive-ui'
 import { computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -41,7 +41,9 @@ function shift(mode: 'copy' | 'swap') {
 
 <template>
   <div>
-    <NEmpty v-if="!tool" :description="t('compare.noTool')" class="my-12" />
+    <p v-if="!tool" class="my-12 text-center nt-muted">
+      {{ t('compare.noTool') }}
+    </p>
     <template v-else>
       <header class="mb-4 flex flex-wrap items-center gap-2">
         <NIcon :component="tool.icon" :size="26" aria-hidden="true" />

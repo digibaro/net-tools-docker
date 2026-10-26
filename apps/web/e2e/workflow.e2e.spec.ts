@@ -5,7 +5,7 @@ test('compare: two independent copies of a tool', async ({ page }) => {
   await page.getByTestId('compare').click()
   await expect(page).toHaveURL(/a\.ip=10\.0\.0\.1/)
   const b = page.getByTestId('compare-b')
-  await b.getByTestId('input').locator('input').fill('172.16.0.1/12')
+  await b.getByTestId('input').fill('172.16.0.1/12')
   await expect(page).toHaveURL(/b\.ip=172\.16\.0\.1/)
   await expect(page.getByTestId('compare-a').getByTestId('result')).toContainText('255.0.0.0')
   await expect(b.getByTestId('result')).toContainText('255.240.0.0')

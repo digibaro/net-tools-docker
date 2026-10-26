@@ -2,7 +2,7 @@
 import type { Tool } from '@/tools/tool'
 import { LayoutColumns, Pin, PinnedOff, Printer, Trash } from '@vicons/tabler'
 import { NButton, NIcon, NTag, NTooltip } from 'naive-ui'
-import { computed, watch } from 'vue'
+import { computed, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { lowBudget, rateBudget } from '@/api/ratelimit'
@@ -27,7 +27,8 @@ watch(() => route.fullPath, () => {
   clearTimeout(settle)
   if (props.tool.runMode === 'browser')
     settle = setTimeout(addHistory, 5000, route.path, window.location.search)
-})
+}, { immediate: true })
+onBeforeUnmount(() => clearTimeout(settle))
 const recent = computed(() => {
   void historyVersion.value
   return getHistory(props.tool.path).filter(e => `?${e.search}` !== window.location.search)

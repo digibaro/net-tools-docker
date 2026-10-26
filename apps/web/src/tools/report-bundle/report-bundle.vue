@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp, Markdown, Printer, Trash } from '@vicons/tabler'
-import { NButton, NEmpty, NIcon, NPopconfirm } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ResultTable from '@/components/ResultTable.vue'
@@ -54,7 +54,9 @@ const json = () => downloadText('nettools-report.json', JSON.stringify(items.val
       </NPopconfirm>
     </div>
   </CCard>
-  <NEmpty v-if="!items.length" :description="t('tools.report-bundle.empty')" class="my-8" data-testid="empty" />
+  <p v-if="!items.length" class="my-8 text-center nt-muted" data-testid="empty">
+    {{ t('tools.report-bundle.empty') }}
+  </p>
   <CCard v-for="(i, n) in items" :key="i.id" :title="`${n + 1}. ${title(i)}${i.label ? ` — ${i.label}` : ''}`" data-testid="report-item">
     <div class="mb-2 flex flex-wrap items-center gap-2 text-xs">
       <RouterLink :to="linkFor(i)" class="font-mono">
