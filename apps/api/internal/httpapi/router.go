@@ -205,6 +205,7 @@ type LimitsInfo struct {
 	PortscanMaxPorts  int   `json:"portscanMaxPorts"`
 	IperfMaxSeconds   int   `json:"iperfMaxSeconds"`
 	BulkMaxTargets    int   `json:"bulkMaxTargets"`
+	MonitorMaxMinutes int   `json:"monitorMaxMinutes"`
 }
 
 func handleCapabilities(deps tools.Deps, all []tools.Tool) http.HandlerFunc {
@@ -224,6 +225,7 @@ func handleCapabilities(deps tools.Deps, all []tools.Tool) http.HandlerFunc {
 			PortscanMaxPorts:  cfg.Limits.PortscanMaxPorts,
 			IperfMaxSeconds:   cfg.Limits.IperfMaxSeconds,
 			BulkMaxTargets:    cfg.Limits.BulkMaxTargets,
+			MonitorMaxMinutes: cfg.Limits.MonitorMaxMinutes,
 		},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {

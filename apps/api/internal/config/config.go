@@ -41,6 +41,8 @@ type Limits struct {
 	ToolTimeoutDefault time.Duration
 	StreamTimeoutMax   time.Duration
 	BulkMaxTargets     int
+	// MonitorMaxMinutes bounds the long-running latency monitor (CON-18).
+	MonitorMaxMinutes int
 }
 
 // Features are admin feature flags.
@@ -143,6 +145,7 @@ func LoadFrom(lookup LookupFunc, readFile ReadFileFunc) (Config, error) {
 			ToolTimeoutDefault: p.duration("TOOL_TIMEOUT_DEFAULT", 15*time.Second),
 			StreamTimeoutMax:   p.duration("STREAM_TIMEOUT_MAX", 120*time.Second),
 			BulkMaxTargets:     p.posInt("BULK_MAX_TARGETS", 50),
+			MonitorMaxMinutes:  p.posInt("MONITOR_MAX_MINUTES", 30),
 		},
 		Features: Features{
 			Portscan:       p.boolean("PORTSCAN_ENABLED", relaxed),

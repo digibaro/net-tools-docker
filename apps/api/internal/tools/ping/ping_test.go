@@ -76,3 +76,29 @@ func TestPingSSRF(t *testing.T) {
 		}
 	}
 }
+
+func TestMonitor(t *testing.T) {
+	var gotCount int
+	var gotInterval time.Duration
+	engine := func(_ context.Context, _ netip.Addr, interval time.Duration, count int, onSent func(Sent), onReply func(Reply, time.Duration)) error {
+		gotCount, gotInterval = count, interval
+		for i := range 4 {
+			onSent(Sent{Seq: i})
+			if i != 2 {
+				onReply(Reply{Seq: i, RTTMs: 10}, 10*time.Millisecond)
+			}
+		}
+		return nil
+	}
+	env := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("93.184.215.14"), Env: map[string]string{"MONITOR_MAX_MINUTES": "10"}})
+	body := env.Get("/api/v1/ping/monitor/stream?target=example.com&minutes=2&interval=2").Raw.Body.String()
+	if strings.Count(body, "event: sent") != 4 || strings.Count(body, "event: reply") != 3 || !strings.Contains(body, `"lossPct":25`) || gotCount != 60 || gotInterval != 2*time.Second {
+		t.Fatalf("count=%d interval=%s body=%s", gotCount, gotInterval, body)
+	}
+	if b := env.Get("/api/v1/ping/monitor/stream?target=example.com&minutes=11").Raw.Body.String(); !strings.Contains(b, `"code":"INVALID_INPUT"`) {
+		t.Errorf("over limit: %s", b)
+	}
+	if b := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{}).Get("/api/v1/ping/monitor/stream?target=10.0.0.1").Raw.Body.String(); !strings.Contains(b, "TARGET_PRIVATE_DENIED") {
+		t.Errorf("ssrf: %s", b)
+	}
+}

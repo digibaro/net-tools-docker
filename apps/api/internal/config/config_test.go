@@ -49,6 +49,7 @@ func TestLoadDefaults(t *testing.T) {
 		MTRMaxCycles: 20, PortscanMaxPorts: 1024, PortscanRatePPS: 200, IperfMaxSeconds: 15,
 		HTTPMaxBodyBytes: 1 << 20, ToolTimeoutDefault: 15 * time.Second,
 		StreamTimeoutMax: 120 * time.Second, BulkMaxTargets: 50,
+		MonitorMaxMinutes: 30,
 	}
 	if cfg.Limits != want {
 		t.Errorf("Limits = %+v, want %+v", cfg.Limits, want)
