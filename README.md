@@ -196,6 +196,14 @@ Health checks: `GET /api/healthz` (process up) and `GET /api/readyz` (dependenci
 - Theme (light / dark / auto) and language (NL / UK) are switched in the top bar; the accent
   colour is under settings (gear icon).
 - Result tables download as CSV; the printer icon prints a tool or saves it as PDF.
+- Recent inputs show as chips under the tool title (pin the ones you reuse); they stay in your
+  browser.
+- The columns icon opens a tool twice side by side (**compare**: two resolvers, before/after).
+- **Add to report** under any result table collects it in the *Report bundle*, which exports
+  Markdown or JSON or prints one report for a ticket.
+- *Bulk lookup* runs a DNS, PTR, ASN or port check over a list of up to 100 targets; it pauses
+  when the rate limit is reached instead of failing.
+- *Provider status* shows which public-service keys are configured and whether calls work.
 - Worldwide results show the probe locations on a map; select a dot to jump to its result.
 - Server tools run from the server's location; many DNS and connectivity tools can also run
   **Worldwide** through Globalping probes.

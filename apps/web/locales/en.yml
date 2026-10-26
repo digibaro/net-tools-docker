@@ -3819,3 +3819,30 @@ tools:
     up: Move up
     down: Move down
     remove: Remove from report
+  bulk-lookup:
+    title: Bulk lookup
+    description: Run a DNS, reverse DNS, IP-to-ASN or port check for a list of up to 100 targets, paced to the rate limit, with one result table to export.
+    targets: 'Targets (one per line, at most {max})'
+    placeholder: "example.com\nexample.net\n# comments are ignored"
+    op: Lookup
+    type: Record type
+    ports: Ports (at most 10)
+    count: '{n} target(s).'
+    tooMany: 'Only the first {max} are used.'
+    run: Run
+    stop: Stop
+    waiting: 'Rate limit reached — continuing in {s} s.'
+    ops:
+      dns: DNS lookup
+      reverse: Reverse DNS (PTR)
+      asn: IP to ASN
+      port: TCP port check
+    status:
+      ok: OK
+      empty: No answer
+      error: Error
+    columns:
+      target: Target
+      status: Status
+      result: Result
+      detail: Detail

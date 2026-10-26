@@ -11,6 +11,7 @@ import { tool as bgpCommunityDecoder } from './bgp-community-decoder'
 import { tool as bgpRouteHistory } from './bgp-route-history'
 import { tool as blacklistCheck } from './blacklist-check'
 import { tool as browserLatency } from './browser-latency'
+import { tool as bulkLookup } from './bulk-lookup'
 import { tool as caaChecker } from './caa-checker'
 import { tool as cacheHeaderAnalyzer } from './cache-header-analyzer'
 import { tool as cdnWafDetector } from './cdn-waf-detector'
@@ -114,11 +115,13 @@ import { tool as portScanner } from './port-scanner'
 import { tool as prefixListTester } from './prefix-list-tester'
 import { tool as prefixStatus } from './prefix-status'
 import { tool as protocolReference } from './protocol-reference'
+import { tool as providerStatus } from './provider-status'
 import { tool as ptrCoverage } from './ptr-coverage'
 import { tool as punycodeConverter } from './punycode-converter'
 import { tool as randomIpGenerator } from './random-ip-generator'
 import { tool as rdapLookup } from './rdap-lookup'
 import { tool as redirectTracer } from './redirect-tracer'
+import { tool as reportBundle } from './report-bundle'
 import { tool as requestHeaders } from './request-headers'
 import { tool as reverseDns } from './reverse-dns'
 import { tool as reverseDnsName } from './reverse-dns-name'
@@ -165,13 +168,11 @@ import { tool as wireguardConfig } from './wireguard-config'
 import { tool as wirelessLinkCalculator } from './wireless-link-calculator'
 import { tool as zoneBuilder } from './zone-builder'
 import { tool as zoneTransferTest } from './zone-transfer-test'
-import { tool as providerStatus } from './provider-status'
-import { tool as reportBundle } from './report-bundle'
 
 // Category order matches docs/TOOLS_CATALOG.md. Empty categories are hidden.
 const categories: { id: string, components: Tool[] }[] = [
   { id: 'ip', components: [ipv4SubnetCalculator, ipv6SubnetCalculator, cidrRangeConverter, cidrAggregator, subnetSplitter, ipInSubnet, ipv4FormatConverter, ipv6ExpandCompress, ipv6UlaGenerator, ipSpecialCheck, wildcardMaskCalculator, reverseDnsName, macAddressLookup, macFormatter, eui64Calculator, whatIsMyIp, vlsmPlanner, ipv4InIpv6, randomIpGenerator, ipv6AddressAnalyzer, ipamSheet, nat64Dns64Check, countryIpBlocks, subnetOverlapChecker] },
-  { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance, dnsTtlPlanner, dnsHealthReport] },
+  { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance, dnsTtlPlanner, dnsHealthReport, bulkLookup] },
   { id: 'connectivity', components: [ping, tcpPing, traceroute, mtr, portCheck, ntpCheck, serverNetworkInfo, isItDown, latencyMatrix, pathMtu, ipv6Readiness, portScanner, iperf, snmp, latencyMonitor] },
   { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder] },
   { id: 'tls', components: [certificateDecoder, tlsInspector, tlsExpiry, csrTool, certKeyMatcher, ctSearch, starttlsCheck, revocationCheck, tlsScanner, sshAudit, keyConverter, daneChecker, certChainValidator, pkcs12Inspector, labCaGenerator] },

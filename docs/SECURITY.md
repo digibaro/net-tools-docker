@@ -134,6 +134,9 @@ Client IP for rate limiting comes from `X-Forwarded-For` **only if** the immedia
   `IPINFO_TOKEN`, `ABUSEIPDB_KEY`, `PEERINGDB_KEY`, `SSLLABS_EMAIL`, `VIRUSTOTAL_KEY`,
   `URLSCAN_KEY`, `SAFEBROWSING_KEY`, `MAXMIND_LICENSE_KEY` (only for the optional updater).
 - Never log keys or full upstream URLs containing keys. Redact in errors.
+- `/api/v1/providers/status` reports per provider only whether a key is set, counters and a
+  client-safe problem text (`HTTP 429`, "did not answer in time"); a test asserts it never contains a
+  key or a provider URL.
 - Outbound provider calls: timeout 10 s (30 s for crt.sh, which is often slow), response size cap 5 MiB, user-agent
   `NetTools/<version> (+<PUBLIC_URL>)`.
 

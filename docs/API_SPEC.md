@@ -48,10 +48,15 @@ Error:
 | 403 | `TOOL_DISABLED` | Feature flag off |
 | 403 | `PROVIDER_KEY_MISSING` | Public provider requires a key not configured |
 | 408 | `TIMEOUT` | Tool exceeded its timeout |
-| 429 | `RATE_LIMITED` | Per-IP limit hit (`Retry-After` header set) |
+| 429 | `RATE_LIMITED` | Per-IP limit hit (`Retry-After` header and `details.retryAfter` set) |
 | 503 | `BUSY` | Global concurrency pool for tool is full |
 | 502 | `PROVIDER_ERROR` | Upstream public API failed (`details.status`) |
 | 500 | `INTERNAL` | Bug; logged with request id |
+
+Rate-limited routes send `X-RateLimit-Class` (`light`/`heavy`), `X-RateLimit-Limit` (per minute) and
+`X-RateLimit-Remaining` on every response. A `RATE_LIMITED` or `BUSY` rejection of a request with
+`Accept: text/event-stream` is sent as HTTP 200 with one SSE `error` event (same `code`, `message`,
+`details.retryAfter`), because `EventSource` cannot read the body of an error response.
 
 ## 2. System endpoints
 
@@ -62,6 +67,7 @@ Error:
 | GET | `/api/v1/version` | `{version, commit, buildDate}` |
 | GET | `/api/v1/capabilities` | Tool availability (below) |
 | GET | `/api/v1/echo` | Client IP as seen, headers, protocol; used by IP-01, CLI-01, CLI-04 |
+| GET | `/api/v1/providers/status` | Provider key configured (bool), requests, fetches, errors, last client-safe problem; never keys or URLs |
 | GET | `/metrics` | Prometheus (only if `METRICS_ENABLED=true`, not proxied by nginx by default) |
 
 ### `/api/v1/capabilities`

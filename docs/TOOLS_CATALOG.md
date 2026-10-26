@@ -71,6 +71,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | DNS-18 | EDNS compliance test | ISC ednscomp-style tests per authoritative server | S | `miekg/dns` | — | 6 | ✅ |
 | DNS-19 | DNS migration / TTL planner | Lower / change / restore timeline from the current TTL, iCalendar export | H | `/api/v1/dns/lookup` (optional) | — | 7 | ✅ |
 | DNS-20 | DNS health report | NS count / spread / lameness, serials, SOA timers, DNSSEC, EDNS, CAA, MX — graded | S | composed from DNS tools | — | 7 | ✅ |
+| DNS-21 | Bulk lookup | DNS / reverse DNS / IP-to-ASN / TCP port check for up to 100 targets, paced to the rate limit (waits on `retryAfter`) | S | existing lookup endpoints | — | 7 | ✅ |
 
 ## 3. Connectivity & Diagnostics
 
@@ -237,6 +238,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CLI-03 | Browser connection info | Network Information API, IPv4/IPv6 reachability, DoH in use? | B | `navigator.connection` + fetch to v4/v6-only endpoints | ipify v4/v6 endpoints | 2 | ✅ |
 | CLI-04 | Request headers echo | Headers the server receives from your browser (proxy detection) | S | `/api/v1/echo` | — | 1 | ✅ |
 | CLI-05 | DNS hijack & proxy check | Server resolver vs public DoH (filtering, NXDOMAIN hijacking); marker header for HTTP proxies | H | `/api/v1/echo`, `/api/v1/dns/lookup` | Cloudflare DoH *(browser-direct)* | 6 | ✅ |
+| CLI-06 | Provider status | Per public provider: key configured (never the key), requests, cache hits, errors, last problem since start | S | `/api/v1/providers/status` | — | 7 | ✅ |
+| CLI-07 | Report bundle | Collect result tables from any tool ("Add to report"), reorder, export Markdown / JSON / print-PDF; kept in the browser | B | `localStorage` | — | 7 | ✅ |
 
 ---
 

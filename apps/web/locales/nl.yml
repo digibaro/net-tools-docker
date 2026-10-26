@@ -3819,3 +3819,30 @@ tools:
     up: Omhoog
     down: Omlaag
     remove: Uit rapport verwijderen
+  bulk-lookup:
+    title: Bulklookup
+    description: Voer een DNS-, reverse-DNS-, IP-naar-ASN- of poortcheck uit voor een lijst van maximaal 100 doelen, afgestemd op de rate limit, met één resultaattabel om te exporteren.
+    targets: 'Doelen (één per regel, maximaal {max})'
+    placeholder: "example.com\nexample.net\n# commentaar wordt genegeerd"
+    op: Lookup
+    type: Recordtype
+    ports: Poorten (maximaal 10)
+    count: '{n} doel(en).'
+    tooMany: 'Alleen de eerste {max} worden gebruikt.'
+    run: Uitvoeren
+    stop: Stoppen
+    waiting: 'Rate limit bereikt — verder over {s} s.'
+    ops:
+      dns: DNS-lookup
+      reverse: Reverse DNS (PTR)
+      asn: IP naar ASN
+      port: TCP-poortcheck
+    status:
+      ok: OK
+      empty: Geen antwoord
+      error: Fout
+    columns:
+      target: Doel
+      status: Status
+      result: Resultaat
+      detail: Detail
