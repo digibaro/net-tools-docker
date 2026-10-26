@@ -171,6 +171,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | BGP-14 | ASN neighbour graph | Upstreams / downstreams with names as an SVG graph, click to re-centre | P | — | RIPEstat asn-neighbours, as-names | 6 | ✅ |
 | BGP-15 | ROA coverage per ASN | RFC 6811 status of every originated prefix, unused / loose ROAs, minimal ROA suggestions | P | — | RIPEstat ris-prefixes, rpki-roas, rpki-validation | 6 | ✅ |
 | BGP-16 | Common IXPs & facilities | Exchanges and facilities two networks share, port speeds, route-server use | P | — | PeeringDB | 6 | ✅ |
+| BGP-17 | Prefix-list / route-filter tester | Cisco prefix-list (ge/le) and Junos route-filter / prefix-list evaluation per route | B | custom | — | 7 | ✅ |
+| BGP-18 | BGP community decoder | Standard / large / extended communities, well-known values, route-server conventions, hex | B | custom | — | 7 | ✅ |
 
 ## 8. Reputation & Geolocation
 
@@ -220,6 +222,8 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CAL-18 | NAT / PAT capacity calculator | CGNAT port blocks, subscribers per IP, IPs needed, deterministic NAT (RFC 7422) | B | custom | — | 7 | ✅ |
 | CAL-19 | Point-to-point wireless link | FSPL, EIRP, receive level, fade margin, Fresnel clearance, earth bulge | B | custom | — | 7 | ✅ |
 | CAL-20 | DSCP / ToS / CoS converter | DSCP ↔ ToS ↔ precedence ↔ 802.1p, RFC 4594 classes, marking snippets | B | custom | — | 7 | ✅ |
+| CAL-21 | Network config diff | Section-aware, order-insensitive diff for IOS/EOS/NX-OS and Junos, secrets masked | B | custom | — | 7 | ✅ |
+| CAL-22 | ACL / firewall rule analyzer | Shadowed / redundant / wide rules in IOS and ASA ACLs, packet tracer | B | custom | — | 7 | ✅ |
 
 ## 11. Client Diagnostics (runs in the user's browser)
 

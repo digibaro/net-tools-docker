@@ -3605,3 +3605,77 @@ tools:
       label: Label
       relation: Relatie
       lines: Regels
+  prefix-list-tester:
+    title: Prefix-list- / route-filtertester
+    description: Plak een Cisco-prefix-list of Junos-route-filter / -prefix-list en zie welke regel elke route toestaat of weigert — ge/le, orlonger, upto en de impliciete deny.
+    config: Prefix-lists of route-filters
+    help: '{n} regels gelezen. Cisco "ip prefix-list NAAM seq N permit P ge X le Y", Junos "route-filter P orlonger / exact / longer / upto /N / prefix-length-range /A-/B, accept or reject" en prefix-list-NAAM-blokken of set-commandos.'
+    routes: Te testen routes (één per regel)
+    unparsed: 'Niet begrepen regels: {lines}'
+    invalidRoute: geen prefix
+    implicit: geen regel past — impliciete deny
+    results:
+      permit: permit
+      deny: deny
+    columns:
+      route: Route
+      list: Lijst
+      result: Resultaat
+      entry: Passende regel
+  bgp-community-decoder:
+    title: BGP-communitydecoder
+    description: Ontleed standaard, large en extended BGP-communities — bekende waarden zoals NO_EXPORT en BLACKHOLE, private ASN's, routeserverconventies en route targets — direct uit show-uitvoer.
+    input: Communities (of plak uitvoer van show ip bgp / show route detail)
+    help: 'Accepteert 65000:100, no-export, 4294901761, large 65000:1:2, rt:65000:100, soo:… en extended communities als 8 bytes hex. Andere waarden dan de bekende betekenen wat het netwerk dat ze zet vastlegt; de getoonde betekenis van routeserverconventies geldt alleen als die routeserver ze volgt.'
+    kinds:
+      standard: Standaard
+      large: Large
+      extended: Extended
+    columns:
+      input: Invoer
+      kind: Soort
+      value: Waarde
+      meaning: Betekenis
+      detail: Detail
+  config-diff:
+    title: Netwerkconfiguratie-diff
+    description: Vergelijk twee router- of switchconfiguraties per sectie — Cisco/Arista/NX-OS-inspringing, Junos-accolades of set-stijl — zonder op volgorde, tijdstempels en commentaar te letten, met geheimen gemaskeerd.
+    before: Voor
+    after: Na
+    format: Formaat
+    note: De configuraties worden in je browser vergeleken en niet in de link opgeslagen. Regels binnen een sectie worden als verzameling vergeleken; een sectie waarvan alleen de volgorde veranderde (belangrijk bij ACL's) wordt als herschikt gemarkeerd.
+    summary: '{sections} sectie(s) gewijzigd: {removed} regel(s) verwijderd, {added} toegevoegd'
+    same: De configuraties zijn gelijk (zonder op volgorde, commentaar en tijdstempels te letten).
+    global: (globaal)
+    reordered: dezelfde regels, andere volgorde
+    formats:
+      auto: Detecteren
+      indented: Ingesprongen (Cisco IOS, Arista EOS, NX-OS)
+      junos: Junos (accolades)
+      set: Junos / VyOS (set-commando's)
+  acl-analyzer:
+    title: ACL- / firewallregelanalyse
+    description: Vind overschaduwde, overbodige en te ruime regels in Cisco IOS- en ASA-access-lists, en traceer welke regel een pakket raakt.
+    input: Access-list
+    help: '{n} regel(s) gelezen. Cisco IOS-ACL''s met naam of nummer (wildcards, host, any, eq / range / gt / lt / neq, established) en ASA "access-list NAAM extended …" met netmaskers. Object-groups en niet-aaneengesloten wildcards worden niet geëvalueerd.'
+    unsupported: 'Niet geëvalueerde regels: {lines}'
+    analysis: Analyse
+    found: '{n} bevinding(en).'
+    clean: Geen overschaduwde, overbodige of te ruime regels gevonden.
+    tester: Pakkettracer
+    acl: ACL
+    proto: Protocol
+    src: Bron-IP
+    dst: Doel-IP
+    port: Doelpoort
+    hit: 'Regel {line} ({action}): {rule}'
+    implicit: Geen regel past — geweigerd door de impliciete deny aan het eind.
+    kinds:
+      shadowed: Overschaduwd (nooit geraakt, eerdere regel beslist anders)
+      redundant: Overbodig (eerdere regel doet dit al)
+      wide: Zeer ruime permit
+    columns:
+      line: Regel
+      rule: Regel
+      kind: Bevinding
+      by: Gedekt door

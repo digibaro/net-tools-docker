@@ -3605,3 +3605,77 @@ tools:
       label: Label
       relation: Relation
       lines: Lines
+  prefix-list-tester:
+    title: Prefix-list / route-filter tester
+    description: Paste a Cisco prefix-list or Junos route-filter / prefix-list and see which line permits or denies each route — ge/le, orlonger, upto and the implicit deny.
+    config: Prefix-lists or route-filters
+    help: '{n} entries read. Cisco "ip prefix-list NAME seq N permit P ge X le Y", Junos "route-filter P orlonger / exact / longer / upto /N / prefix-length-range /A-/B, accept or reject" and prefix-list NAME blocks or set commands.'
+    routes: Routes to test (one per line)
+    unparsed: 'Lines not understood: {lines}'
+    invalidRoute: not a prefix
+    implicit: no line matches — implicit deny
+    results:
+      permit: permit
+      deny: deny
+    columns:
+      route: Route
+      list: List
+      result: Result
+      entry: Matching line
+  bgp-community-decoder:
+    title: BGP community decoder
+    description: Decode standard, large and extended BGP communities — well-known values such as NO_EXPORT and BLACKHOLE, private ASNs, route-server conventions and route targets — straight from show output.
+    input: Communities (or paste show ip bgp / show route detail output)
+    help: 'Accepts 65000:100, no-export, 4294901761, large 65000:1:2, rt:65000:100, soo:… and 8-byte hex extended communities. Values other than the well-known ones mean what the network that sets them defines; the meanings shown for route-server conventions apply only if that route server follows them.'
+    kinds:
+      standard: Standard
+      large: Large
+      extended: Extended
+    columns:
+      input: Input
+      kind: Type
+      value: Value
+      meaning: Meaning
+      detail: Detail
+  config-diff:
+    title: Network config diff
+    description: Compare two router or switch configurations per section — Cisco/Arista/NX-OS indentation, Junos braces or set style — ignoring line order, timestamps and comments, with secrets masked.
+    before: Before
+    after: After
+    format: Format
+    note: The configurations are compared in your browser and are not stored in the link. Lines inside a section are compared as a set; a section whose lines only changed order (relevant for ACLs) is marked as reordered.
+    summary: '{sections} section(s) changed: {removed} line(s) removed, {added} added'
+    same: The configurations are the same (ignoring order, comments and timestamps).
+    global: (global)
+    reordered: same lines, different order
+    formats:
+      auto: Detect
+      indented: Indented (Cisco IOS, Arista EOS, NX-OS)
+      junos: Junos (braces)
+      set: Junos / VyOS (set commands)
+  acl-analyzer:
+    title: ACL / firewall rule analyzer
+    description: Find shadowed, redundant and overly wide rules in Cisco IOS and ASA access lists, and trace which line a packet hits.
+    input: Access list
+    help: '{n} rule(s) read. Cisco IOS named or numbered ACLs (wildcards, host, any, eq / range / gt / lt / neq, established) and ASA "access-list NAME extended …" with netmasks. Object groups and non-contiguous wildcards are not evaluated.'
+    unsupported: 'Lines not evaluated: {lines}'
+    analysis: Analysis
+    found: '{n} finding(s).'
+    clean: No shadowed, redundant or overly wide rules found.
+    tester: Packet tracer
+    acl: ACL
+    proto: Protocol
+    src: Source IP
+    dst: Destination IP
+    port: Destination port
+    hit: 'Line {line} ({action}): {rule}'
+    implicit: No line matches — denied by the implicit deny at the end.
+    kinds:
+      shadowed: Shadowed (never hit, earlier rule decides otherwise)
+      redundant: Redundant (earlier rule already does this)
+      wide: Very wide permit
+    columns:
+      line: Line
+      rule: Rule
+      kind: Finding
+      by: Covered by
