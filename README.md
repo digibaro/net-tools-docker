@@ -118,6 +118,29 @@ Tools that need a key show "API key missing" until it is set.
 
 URL reputation needs at least one of its three keys; the others are reported as skipped.
 
+### Sign-in (optional)
+
+Off by default. With `AUTH_MODE=oidc` NET-TOOLS signs users in with any OpenID Connect provider
+(Keycloak, Authentik, Entra ID, Google, Authelia…). Register a confidential client with redirect URI
+`<PUBLIC_URL>/api/v1/auth/callback`; the session is a signed cookie, so there is no database.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `AUTH_MODE` | `off` | `oidc` turns sign-in on |
+| `OIDC_ISSUER` | — | Issuer URL (discovery at `/.well-known/openid-configuration`) |
+| `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` | — | Client credentials (`OIDC_CLIENT_SECRET_FILE` works too) |
+| `OIDC_REDIRECT_URL` | `<PUBLIC_URL>/api/v1/auth/callback` | Override when the public URL differs |
+| `OIDC_SCOPES` | `openid profile email` | Add `groups` if your provider needs it |
+| `OIDC_ROLES_CLAIM` | `groups` | Claim with the groups; dotted for nested claims (`realm_access.roles`) |
+| `OIDC_ADMIN_GROUPS` | — | Groups that get the admin role |
+| `OIDC_USER_GROUPS` | — | If set, only these groups (and admins) may sign in |
+| `SESSION_SECRET` | — | Required, ≥ 32 characters (`openssl rand -hex 32`); `SESSION_SECRET_FILE` works too |
+| `SESSION_TTL` | `12h` | How long a sign-in lasts |
+| `AUTH_ANONYMOUS_ROLE` | `none` | `none`: visitors only get browser tools; `user`: sign-in is only needed for admin tools |
+| `AUTH_ADMIN_TOOLS` | `sys.providers` | Capability ids only admins may use (for example `net.portscan,net.snmp,net.iperf`) |
+
+`PUBLIC_URL` must be the address users open (it sets the cookie's `Secure` flag for `https://`).
+
 ### Limits
 
 Rate limits and per-tool bounds keep the server from being abused. The most useful ones:

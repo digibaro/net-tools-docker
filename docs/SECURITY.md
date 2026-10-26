@@ -142,9 +142,32 @@ Client IP for rate limiting comes from `X-Forwarded-For` **only if** the immedia
 
 ## 7. Auth
 
-No built-in accounts in v1. For anything beyond `homelab`, put NetTools behind an authenticating
-reverse proxy (Authelia, oauth2-proxy, Cloudflare Access, Tailscale). Optional built-in
-`BASIC_AUTH_USERS` (htpasswd bcrypt) in nginx for quick protection.
+Off by default (`AUTH_MODE=off`): anyone who reaches NetTools may use every enabled tool, so put it
+behind an authenticating reverse proxy (Authelia, oauth2-proxy, Cloudflare Access, Tailscale) or nginx
+`BASIC_AUTH_USERS` for anything beyond `homelab`.
+
+`AUTH_MODE=oidc` adds built-in sign-in (`internal/auth`):
+
+- Authorization code flow with PKCE (S256), `state` and `nonce`. They are kept in a 10-minute signed
+  cookie scoped to `/api/v1/auth`; the ID token is verified (issuer, audience, expiry, signature via
+  JWKS) and its nonce compared.
+- Session: an HMAC-SHA256-signed cookie `nt_session` (`HttpOnly`, `SameSite=Lax`, `Secure` when
+  `PUBLIC_URL` is https) holding sub, name, email, role and expiry (`SESSION_TTL`). No server state;
+  changing `SESSION_SECRET` signs everyone out. Keys are derived per purpose from the secret.
+- Roles: `admin` (member of `OIDC_ADMIN_GROUPS`), `user` (any other allowed account), anonymous
+  (`AUTH_ANONYMOUS_ROLE`, `none` or `user`). `OIDC_USER_GROUPS` restricts who may sign in.
+- Every tool route is wrapped by `auth.Require(toolID)`: anonymous visitors without a role get
+  `401 UNAUTHENTICATED`; tools in `AUTH_ADMIN_TOOLS` need a signed-in admin, else `403 FORBIDDEN`
+  (anonymous visitors get 401 there too, even with `AUTH_ANONYMOUS_ROLE=user`).
+  `/capabilities` reports these tools as `login_required` / `forbidden_role` per visitor and is
+  sent with `Cache-Control: no-store`.
+- CSRF: besides `SameSite=Lax`, state-changing requests with an `Origin` header that matches neither
+  `PUBLIC_URL` nor the request host are refused (403).
+- Open redirects: `next` must be an in-app path (`/…`, not `//…`); anything else becomes `/`.
+- The issuer is admin configuration, so discovery, JWKS and the token exchange use a plain HTTP
+  client (10 s timeout) instead of the target policy: an internal IdP works. Discovery is lazy;
+  the API starts while the IdP is down.
+- Rate limits stay per client IP.
 
 ## 8. Logging & audit
 

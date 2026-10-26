@@ -70,6 +70,8 @@ runMode:
 capabilities:
   disabledTitle: Deze tool is niet beschikbaar
   reasons:
+    login_required: Log in om deze tool te gebruiken.
+    forbidden_role: Deze tool is alleen voor beheerders.
     disabled_by_admin: Uitgeschakeld door de beheerder.
     provider_key_missing: Vereist een API-sleutel die niet op de server is ingesteld.
     requires_lan_mode: Vereist LAN-modus (hostnetwerk) op de server.
@@ -91,6 +93,8 @@ apiErrors:
   RATE_LIMITED: Te veel verzoeken, even geduld
   BUSY: De server is bezet, probeer het zo opnieuw
   PROVIDER_ERROR: De externe dienst gaf een fout
+  UNAUTHENTICATED: Inloggen vereist
+  FORBIDDEN: Niet toegestaan
   INTERNAL: Onverwachte serverfout
   NOT_FOUND: Endpoint niet gevonden
   METHOD_NOT_ALLOWED: Methode niet toegestaan
@@ -178,6 +182,21 @@ report:
     status: Resultaat
     check: Controle
     detail: Detail
+auth:
+  signIn: Inloggen
+  signOut: Uitloggen
+  account: 'Account: {name}'
+  roles:
+    user: gebruiker
+    admin: beheerder
+  errors:
+    state: Het inloggen duurde te lang of is in een ander tabblad gestart. Probeer het opnieuw.
+    exchange: De identity provider accepteerde het inloggen niet. Probeer het opnieuw.
+    token: Het antwoord van de identity provider kon niet worden gecontroleerd.
+    not_allowed: Je account zit niet in een groep die NET-TOOLS mag gebruiken.
+    denied: Het inloggen is geannuleerd of geweigerd door de identity provider.
+    idp_unreachable: De identity provider is niet bereikbaar vanaf de NET-TOOLS-server.
+    internal: Inloggen mislukt.
 compare:
   nav: Vergelijken
   open: Naast elkaar vergelijken

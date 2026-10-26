@@ -45,6 +45,8 @@ Error:
 | 400 | `TARGET_UNRESOLVABLE` | DNS resolution failed |
 | 403 | `TARGET_PRIVATE_DENIED` | Target is private/loopback/link-local and `ALLOW_PRIVATE_TARGETS=false` |
 | 403 | `TARGET_BLOCKED` | Matches deny-list (metadata IPs, configured CIDRs) |
+| 401 | `UNAUTHENTICATED` | `AUTH_MODE=oidc` and the tool needs a signed-in user |
+| 403 | `FORBIDDEN` | Signed in, but the tool is in `AUTH_ADMIN_TOOLS` |
 | 403 | `TOOL_DISABLED` | Feature flag off |
 | 403 | `PROVIDER_KEY_MISSING` | Public provider requires a key not configured |
 | 408 | `TIMEOUT` | Tool exceeded its timeout |
@@ -67,6 +69,9 @@ Rate-limited routes send `X-RateLimit-Class` (`light`/`heavy`), `X-RateLimit-Lim
 | GET | `/api/v1/version` | `{version, commit, buildDate}` |
 | GET | `/api/v1/capabilities` | Tool availability (below) |
 | GET | `/api/v1/echo` | Client IP as seen, headers, protocol; used by IP-01, CLI-01, CLI-04 |
+| GET | `/api/v1/auth/login?next=` | OIDC login redirect (only with `AUTH_MODE=oidc`) |
+| GET | `/api/v1/auth/callback` | OIDC redirect URI; sets `nt_session`, redirects to `next` or `/?auth_error=<code>` |
+| POST | `/api/v1/auth/logout` | Clears the session; `{logoutUrl}` of the IdP when it has an end-session endpoint |
 | GET | `/api/v1/providers/status` | Provider key configured (bool), requests, fetches, errors, last client-safe problem; never keys or URLs |
 | GET | `/metrics` | Prometheus (only if `METRICS_ENABLED=true`, not proxied by nginx by default) |
 

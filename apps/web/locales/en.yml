@@ -70,6 +70,8 @@ runMode:
 capabilities:
   disabledTitle: This tool is unavailable
   reasons:
+    login_required: Sign in to use this tool.
+    forbidden_role: This tool is limited to administrators.
     disabled_by_admin: Disabled by the administrator.
     provider_key_missing: Requires an API key that is not configured on the server.
     requires_lan_mode: Requires LAN mode (host networking) on the server.
@@ -91,6 +93,8 @@ apiErrors:
   RATE_LIMITED: Too many requests, please wait
   BUSY: Server is busy, try again shortly
   PROVIDER_ERROR: The upstream service failed
+  UNAUTHENTICATED: Sign in required
+  FORBIDDEN: Not allowed
   INTERNAL: Unexpected server error
   NOT_FOUND: Endpoint not found
   METHOD_NOT_ALLOWED: Method not allowed
@@ -178,6 +182,21 @@ report:
     status: Result
     check: Check
     detail: Detail
+auth:
+  signIn: Sign in
+  signOut: Sign out
+  account: 'Account: {name}'
+  roles:
+    user: user
+    admin: administrator
+  errors:
+    state: The sign-in took too long or was started in another tab. Please try again.
+    exchange: The identity provider did not accept the sign-in. Please try again.
+    token: The identity provider's answer could not be verified.
+    not_allowed: Your account is not in a group that may use NET-TOOLS.
+    denied: The sign-in was cancelled or refused by the identity provider.
+    idp_unreachable: The identity provider cannot be reached from the NET-TOOLS server.
+    internal: Sign-in failed.
 compare:
   nav: Compare
   open: Compare side by side
