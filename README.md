@@ -205,9 +205,26 @@ Without the override these tools show "needs LAN mode".
 
 Put NET-TOOLS behind your proxy (Traefik, Caddy, nginx) and forward to port 8080.
 
+**Proxy in Docker on the same host:** connect the web container to the proxy's network with the
+included `docker-compose.proxy.yml`, so the proxy reaches it as `http://nettools:8080`:
+
+```bash
+docker network create proxy        # skip if your proxy's network already exists
+# in .env (PROXY_NETWORK is the network's name, default "proxy"):
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.proxy.yml
+#   PROXY_NETWORK=proxy
+#   NETTOOLS_PORT=127.0.0.1:8080   # optional: no longer publish the port on all interfaces
+docker compose up -d
+```
+
+`web` stays on the project's own network too (it needs it to reach `api`); a hand-written override
+that lists only the proxy network breaks that. The network must exist beforehand (`external`).
+Not combinable with LAN mode, which uses host networking.
+
 - Set `PUBLIC_URL` to the public address (used in the User-Agent of outgoing requests).
-- Set `TRUSTED_PROXIES` to the proxy's address range so client IPs (for rate limits) are taken
-  from `X-Forwarded-For`.
+- Client IPs (rate limits, audit log) are taken from `X-Forwarded-For` when the proxy's address is
+  in `TRUSTED_PROXIES` (default `172.16.0.0/12`, which covers Docker networks). Add your proxy's
+  range if it is elsewhere, for example a custom network subnet or a proxy on another host.
 - Set `ENABLE_HSTS=true` once HTTPS works.
 
 Health checks: `GET /api/healthz` (process up) and `GET /api/readyz` (dependencies ready).

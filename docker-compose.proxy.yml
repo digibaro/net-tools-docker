@@ -1,0 +1,20 @@
+# Connects the web container to an existing Docker network that your reverse proxy
+# (Traefik, Caddy, nginx-proxy-manager, …) is on, so the proxy can reach it as http://nettools:8080.
+#
+#   docker network create proxy            # only if it does not exist yet
+#   echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.proxy.yml' >> .env
+#   docker compose up -d
+#
+# PROXY_NETWORK names the network (default "proxy"). web stays on the project's default network
+# as well, otherwise it can no longer reach the api. Not combinable with docker-compose.lan.yml
+# (host networking). See README "Behind a reverse proxy".
+services:
+  web:
+    networks:
+      default:
+      proxy:
+        aliases: [nettools]
+networks:
+  proxy:
+    name: ${PROXY_NETWORK:-proxy}
+    external: true
