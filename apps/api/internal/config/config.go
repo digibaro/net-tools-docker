@@ -236,11 +236,7 @@ func secret(lookup LookupFunc, readFile ReadFileFunc, name string) (string, erro
 }
 
 func list(s string) []string {
-	var out []string
-	for _, f := range strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ' ' }) {
-		out = append(out, f)
-	}
-	return out
+	return strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ' ' })
 }
 
 // MinSessionSecret is the shortest accepted SESSION_SECRET (bytes).

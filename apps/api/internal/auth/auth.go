@@ -82,7 +82,8 @@ func (s *Service) setup(ctx context.Context) error {
 	}
 	_ = p.Claims(&extra)
 	s.provider, s.endURL = p, extra.EndSession
-	s.verifier = p.VerifierContext(oidc.ClientContext(context.Background(), s.HTTP), &oidc.Config{ClientID: s.cfg.ClientID, Now: s.now})
+	// The verifier keeps this context for later JWKS refreshes, so it must outlive the request.
+	s.verifier = p.VerifierContext(context.WithoutCancel(ctx), &oidc.Config{ClientID: s.cfg.ClientID, Now: s.now})
 	s.oauth = &oauth2.Config{ClientID: s.cfg.ClientID, ClientSecret: s.cfg.ClientSecret, Endpoint: p.Endpoint(), RedirectURL: s.cfg.RedirectURL, Scopes: s.cfg.Scopes}
 	return nil
 }
@@ -165,6 +166,7 @@ func SafeNext(next string) string {
 }
 
 func (s *Service) cookie(name, value, path string, maxAge time.Duration) *http.Cookie {
+	//nolint:gosec // Secure follows PUBLIC_URL: plain-http installs (localhost, LAN) still need the cookie
 	c := &http.Cookie{Name: name, Value: value, Path: path, HttpOnly: true, Secure: s.secure, SameSite: http.SameSiteLaxMode, MaxAge: int(maxAge.Seconds())}
 	if maxAge < 0 {
 		c.MaxAge = -1
@@ -301,7 +303,7 @@ func cmpOr(vals ...string) string {
 }
 
 // Logout clears the session; it returns the IdP's end-session URL when it has one.
-func (s *Service) Logout(w http.ResponseWriter, r *http.Request) string {
+func (s *Service) Logout(w http.ResponseWriter, _ *http.Request) string {
 	http.SetCookie(w, s.cookie(SessionCookie, "", "/", -1))
 	s.mu.Lock()
 	end := s.endURL
