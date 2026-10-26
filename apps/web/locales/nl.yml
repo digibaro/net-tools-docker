@@ -178,6 +178,17 @@ report:
     status: Resultaat
     check: Controle
     detail: Detail
+compare:
+  nav: Vergelijken
+  open: Naast elkaar vergelijken
+  title: 'Vergelijken: {tool}'
+  swap: Kanten wisselen
+  copy: Links naar rechts kopiëren
+  single: De losse tool openen
+  noTool: Geen tool gekozen. Gebruik de vergelijkknop op een toolpagina.
+  side:
+    a: Links
+    b: Rechts
 history:
   recent: 'Recent:'
   pin: Vastzetten

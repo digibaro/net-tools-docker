@@ -178,6 +178,17 @@ report:
     status: Result
     check: Check
     detail: Detail
+compare:
+  nav: Compare
+  open: Compare side by side
+  title: 'Compare: {tool}'
+  swap: Swap sides
+  copy: Copy left to right
+  single: Open the single tool
+  noTool: No tool selected. Use the compare button on a tool page.
+  side:
+    a: Left
+    b: Right
 history:
   recent: 'Recent:'
   pin: Pin

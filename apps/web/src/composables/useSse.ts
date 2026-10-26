@@ -1,6 +1,7 @@
 import { onScopeDispose, ref, shallowRef } from 'vue'
 import { ApiError } from '@/api/client'
 import { recordCurrent } from './history'
+import { useQueryScope } from './queryScope'
 import { buildQuery } from './useApi'
 
 type Params = Record<string, string | number | boolean | undefined>
@@ -30,6 +31,7 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
   const status = ref<SseStatus>('idle')
   const error = shallowRef<ApiError>()
   let source: EventSourceLike | undefined
+  const scope = useQueryScope()
 
   function close() {
     source?.close()
@@ -40,7 +42,7 @@ export function useSse(path: string, handlers: SseHandlers, createSource: (url: 
     close()
     error.value = undefined
     status.value = 'running'
-    recordCurrent()
+    recordCurrent(scope)
     const es = createSource(`/api${path}${buildQuery(params)}`)
     source = es
     const events = new Set([...Object.keys(handlers), 'done', 'error'])

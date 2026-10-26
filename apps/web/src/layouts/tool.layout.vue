@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Tool } from '@/tools/tool'
-import { Pin, PinnedOff, Printer, Trash } from '@vicons/tabler'
+import { LayoutColumns, Pin, PinnedOff, Printer, Trash } from '@vicons/tabler'
 import { NButton, NIcon, NTag, NTooltip } from 'naive-ui'
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -10,6 +10,7 @@ import FavoriteButton from '@/components/FavoriteButton.vue'
 import RunModeBadge from '@/components/RunModeBadge.vue'
 import ToolDisabled from '@/components/ToolDisabled.vue'
 import { addHistory, clearHistory, getHistory, historyVersion, label, togglePin } from '@/composables/history'
+import { compareQuery } from '@/composables/queryScope'
 import { useCapabilitiesStore } from '@/stores/capabilities.store'
 
 const props = defineProps<{ tool: Tool }>()
@@ -32,6 +33,7 @@ const recent = computed(() => {
   return getHistory(props.tool.path).filter(e => `?${e.search}` !== window.location.search)
 })
 const open = (search: string) => router.push(`${props.tool.path}?${search}`)
+const compare = () => router.push({ path: '/compare', query: compareQuery(props.tool.path, route.query) })
 const heavyLeft = computed(() => (props.tool.runMode === 'browser' ? undefined : lowBudget(rateBudget.heavy)))
 </script>
 
@@ -54,6 +56,16 @@ const heavyLeft = computed(() => (props.tool.runMode === 'browser' ? undefined :
             </NButton>
           </template>
           {{ t('common.print') }}
+        </NTooltip>
+        <NTooltip>
+          <template #trigger>
+            <NButton quaternary circle size="small" class="nt-no-print" :aria-label="t('compare.open')" data-testid="compare" @click="compare()">
+              <template #icon>
+                <NIcon aria-hidden="true" :component="LayoutColumns" />
+              </template>
+            </NButton>
+          </template>
+          {{ t('compare.open') }}
         </NTooltip>
       </div>
       <p class="mb-0 mt-2 nt-muted">

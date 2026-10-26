@@ -21,6 +21,7 @@ export const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: () => import('./pages/Home.page.vue') },
     { path: '/about', name: 'about', component: () => import('./pages/About.page.vue'), meta: { titleKey: 'nav.about' } },
+    { path: '/compare', name: 'compare', component: () => import('./pages/Compare.page.vue'), meta: { titleKey: 'compare.nav' } },
     { path: '/settings', name: 'settings', component: () => import('./pages/Settings.page.vue'), meta: { titleKey: 'nav.settings' } },
     ...toolRoutes,
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('./pages/NotFound.page.vue'), meta: { titleKey: 'notFound.title' } },

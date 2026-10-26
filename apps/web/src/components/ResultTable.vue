@@ -5,6 +5,7 @@ import { NA, NButton, NDataTable, NIcon, useMessage } from 'naive-ui'
 import { computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
+import { scopedLocation, useQueryScope } from '@/composables/queryScope'
 import { addToReport } from '@/composables/report'
 import { csvName, toCsv } from '@/utils/csv'
 import { downloadText } from '@/utils/download'
@@ -77,8 +78,9 @@ function downloadCsv() {
 }
 
 const message = useMessage()
+const scope = useQueryScope()
 function report() {
-  const ok = addToReport({ path: window.location.pathname, search: window.location.search, label: props.label ?? '', columns: props.columns, rows: props.rows })
+  const ok = addToReport({ ...scopedLocation(scope), label: props.label ?? '', columns: props.columns, rows: props.rows })
   if (ok)
     message.success(t('report.added'))
   else

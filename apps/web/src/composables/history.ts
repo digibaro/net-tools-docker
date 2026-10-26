@@ -1,4 +1,6 @@
+import type { QueryScope } from './queryScope'
 import { ref } from 'vue'
+import { scopedLocation } from './queryScope'
 
 export interface Entry { search: string, at: number, pinned: boolean }
 export const MAX_ENTRIES = 10
@@ -53,10 +55,12 @@ export function addHistory(path: string, search: string, now = Date.now()) {
   historyVersion.value++
 }
 
-/** Records the current page (called when a server tool runs). */
-export function recordCurrent() {
-  if (typeof window !== 'undefined' && window.location)
-    addHistory(window.location.pathname, window.location.search)
+/** Records the current page (called when a server tool runs); compare sides record their own tool. */
+export function recordCurrent(scope?: QueryScope) {
+  if (typeof window !== 'undefined' && window.location) {
+    const { path, search } = scopedLocation(scope)
+    addHistory(path, search)
+  }
 }
 
 export function getHistory(path: string): Entry[] {
