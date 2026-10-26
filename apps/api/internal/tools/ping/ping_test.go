@@ -100,8 +100,31 @@ func TestMonitor(t *testing.T) {
 	if b := env.Get("/api/v1/ping/monitor/stream?target=example.com&minutes=11").Raw.Body.String(); !strings.Contains(b, `"code":"INVALID_INPUT"`) {
 		t.Errorf("over limit: %s", b)
 	}
-	if b := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{}).Get("/api/v1/ping/monitor/stream?target=10.0.0.1").Raw.Body.String(); !strings.Contains(b, "TARGET_PRIVATE_DENIED") {
-		t.Errorf("ssrf: %s", b)
+}
+
+func TestMonitorSSRF(t *testing.T) {
+	engine := func(context.Context, netip.Addr, time.Duration, int, func(Sent), func(Reply, time.Duration)) error {
+		t.Error("engine called for a refused target")
+		return nil
+	}
+	// internal.example resolves to 10.0.0.5: a public-looking name pointing inside (DNS rebinding).
+	env := tooltest.New(t, &MonitorTool{Engine: engine}, tooltest.Options{Lookup: tooltest.StaticLookup("10.0.0.5")})
+	for target, code := range map[string]string{
+		"127.0.0.1":          "TARGET_PRIVATE_DENIED",
+		"::1":                "TARGET_PRIVATE_DENIED",
+		"10.1.1.1":           "TARGET_PRIVATE_DENIED",
+		"fe80::1":            "TARGET_PRIVATE_DENIED",
+		"169.254.169.254":    "TARGET_BLOCKED",
+		"::ffff:192.168.0.1": "TARGET_PRIVATE_DENIED",
+		"0x7f.1":             "INVALID_INPUT",
+		"2130706433":         "INVALID_INPUT",
+		"internal.example":   "TARGET_PRIVATE_DENIED",
+		"224.0.0.1":          "TARGET_BLOCKED",
+	} {
+		body := env.Get("/api/v1/ping/monitor/stream?target=" + target).Raw.Body.String()
+		if !strings.Contains(body, `"code":"`+code+`"`) || strings.Contains(body, "event: sent") {
+			t.Errorf("%s: %s", target, body)
+		}
 	}
 }
 

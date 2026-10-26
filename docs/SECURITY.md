@@ -167,6 +167,8 @@ behind an authenticating reverse proxy (Authelia, oauth2-proxy, Cloudflare Acces
 - The issuer is admin configuration, so discovery, JWKS and the token exchange use a plain HTTP
   client (10 s timeout) instead of the target policy: an internal IdP works. Discovery is lazy;
   the API starts while the IdP is down.
+- `/auth/login`, `/auth/callback` and `/auth/logout` use the light rate limit (login and callback
+  call the IdP).
 - Rate limits stay per client IP.
 
 ## 8. Logging & audit

@@ -148,10 +148,14 @@ func NewRouter(o Options) http.Handler {
 			r.Get("/version", handleVersion(o.Build))
 			r.Get("/capabilities", handleCapabilities(deps, o.Tools, authz))
 			if authz != nil {
-				r.Get("/auth/login", authz.Login)
-				r.Get("/auth/callback", authz.Callback)
-				r.Post("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
-					JSON(w, r, map[string]string{"logoutUrl": authz.Logout(w, r)}, nil)
+				// Login and callback make outbound calls to the IdP: rate-limited like light tools.
+				r.Group(func(g chi.Router) {
+					g.Use(deps.RateLimit(limits.Light))
+					g.Get("/auth/login", authz.Login)
+					g.Get("/auth/callback", authz.Callback)
+					g.Post("/auth/logout", func(w http.ResponseWriter, r *http.Request) {
+						JSON(w, r, map[string]string{"logoutUrl": authz.Logout(w, r)}, nil)
+					})
 				})
 			}
 			r.Get("/echo", handleEcho(o.Config.Features.TrustedProxies))

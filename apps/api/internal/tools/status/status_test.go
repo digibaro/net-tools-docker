@@ -89,6 +89,10 @@ func TestAuthRoles(t *testing.T) {
 	if caps.Auth.Mode != "oidc" || caps.Tools["sys.providers"].Enabled || caps.Tools["sys.providers"].Reason != "login_required" || r.Raw.Header().Get("Cache-Control") != "no-store" {
 		t.Errorf("capabilities = %+v", caps)
 	}
+	// The login endpoints are rate-limited (light class).
+	if h := e.Get("/api/v1/auth/login").Raw.Header().Get("X-RateLimit-Class"); h != "light" {
+		t.Errorf("auth/login rate class = %q", h)
+	}
 	// Cross-site POSTs are refused while cookie auth is on.
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/v1/auth/logout", nil)
 	req.Header.Set("Origin", "https://evil.example")
