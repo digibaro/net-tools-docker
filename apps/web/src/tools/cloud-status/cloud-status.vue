@@ -9,7 +9,7 @@ import ApiError from '@/components/ApiError.vue'
 import { useApi } from '@/composables/useApi'
 import { useQueryParam } from '@/composables/useQueryParam'
 import CCard from '@/ui/c-card.vue'
-import { filterServices, safeUrl, sortServices, stateTag, summarize } from './cloud-status.service'
+import { filterServices, safeUrl, shortList, sortServices, stateTag, summarize } from './cloud-status.service'
 
 const { t, locale } = useI18n()
 const q = useQueryParam({ name: 'q', defaultValue: '' })
@@ -94,7 +94,7 @@ const summary = computed(() => summarize(data.value?.services ?? []))
           </li>
         </ul>
         <p v-if="s.components.length" class="mb-0 mt-2 text-xs nt-muted">
-          {{ t('tools.cloud-status.components', { list: s.components.join(', ') }) }}
+          {{ t('tools.cloud-status.components', { list: shortList(s.components).shown }) }}<span v-if="shortList(s.components).more"> {{ t('tools.cloud-status.more', { n: shortList(s.components).more }) }}</span>
         </p>
         <div class="mt-2">
           <NA v-if="safeUrl(s.page)" :href="safeUrl(s.page)" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-sm">

@@ -42,3 +42,8 @@ export function filterServices(list: CloudService[], q: string, problemsOnly: bo
   return list.filter(s => (!problemsOnly || ['outage', 'degraded', 'maintenance', 'unknown'].includes(s.state))
     && (!needle || s.name.toLowerCase().includes(needle) || s.incidents.some(i => i.title.toLowerCase().includes(needle))))
 }
+
+/** At most `max` names, plus how many were left out. */
+export function shortList(names: string[], max = 8): { shown: string, more: number } {
+  return { shown: names.slice(0, max).join(', '), more: Math.max(0, names.length - max) }
+}

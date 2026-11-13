@@ -3873,6 +3873,7 @@ tools:
     checkedAt: 'checked {time}'
     updated: 'updated {time}'
     components: 'Affected: {list}'
+    more: '+ {n} more'
     open: Status page
     linkOnly: No public feed — open the status page to check.
     none: No services match the filter.

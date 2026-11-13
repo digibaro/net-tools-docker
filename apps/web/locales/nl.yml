@@ -3873,6 +3873,7 @@ tools:
     checkedAt: 'gecontroleerd {time}'
     updated: 'bijgewerkt {time}'
     components: 'Getroffen: {list}'
+    more: '+ {n} meer'
     open: Statuspagina
     linkOnly: Geen openbare feed — open de statuspagina om te kijken.
     none: Geen diensten gevonden voor dit filter.

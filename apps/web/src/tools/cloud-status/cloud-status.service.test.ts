@@ -1,6 +1,6 @@
 import type { CloudService } from './cloud-status.service'
 import { describe, expect, it } from 'vitest'
-import { filterServices, safeUrl, sortServices, stateTag, summarize } from './cloud-status.service'
+import { filterServices, safeUrl, shortList, sortServices, stateTag, summarize } from './cloud-status.service'
 
 function svc(id: string, state: CloudService['state'], incidents: CloudService['incidents'] = []): CloudService {
   return { id, name: id.toUpperCase(), group: 'g', kind: state === 'link' ? 'link' : 'statuspage', page: `https://${id}.test/`, state, incidents, components: [], error: '' }
@@ -32,5 +32,12 @@ describe('cloud-status', () => {
   it('filters by name, incident title and problems', () => {
     expect(filterServices(list, 'mail', false).map(s => s.id)).toEqual(['d'])
     expect(filterServices(list, '', true).map(s => s.id)).toEqual(['b', 'c', 'd'])
+  })
+})
+
+describe('shortList', () => {
+  it('caps long component lists', () => {
+    expect(shortList(['a', 'b', 'c'], 2)).toEqual({ shown: 'a, b', more: 1 })
+    expect(shortList(['a'])).toEqual({ shown: 'a', more: 0 })
   })
 })
