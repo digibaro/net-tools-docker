@@ -3916,6 +3916,39 @@ tools:
       hsts: HSTS (Strict-Transport-Security)
       http2: HTTP/2
       http3: HTTP/3 (QUIC)
+  ipv6-test:
+    title: IPv6 connection test
+    description: Is IPv6 working on the connection of this browser? IPv4 and IPv6 reachability, which one dual-stack sites use, slow fallback from broken IPv6 — scored out of 10, like test-ipv6.com.
+    intro: Your browser fetches small answers from public test endpoints (ipify, Cloudflare) over IPv4, IPv6 and dual stack. Nothing goes through the NET-TOOLS server.
+    run: Run again
+    result: Result
+    details: Tests
+    scoreLabel: 'IPv6 readiness {score} out of 10'
+    ok: 'OK over {family}'
+    prefersV6: Dual-stack sites are reached over IPv6.
+    prefersV4: Dual-stack sites are reached over IPv4, although IPv6 works (the browser or OS prefers IPv4).
+    slowFallback: Dual-stack sites load more than a second slower than IPv4-only ones. IPv6 is probably configured but broken, and the browser waits before falling back to IPv4.
+    note: 'An IPv6 address literal cannot be tested here (browsers do not allow it under this page''s content security policy), and neither can large packets over IPv6 (MTU problems). Click an address to look up its network.'
+    verdicts:
+      ipv6-ok: IPv6 and IPv4 both work. This connection is ready for IPv6.
+      ipv4-only: Only IPv4 works. Sites are reachable, but this connection has no IPv6; ask your provider or check the router.
+      ipv6-only: Only IPv6 works directly; IPv4 sites are reached through NAT64 or a similar translation.
+      broken: The dual-stack test failed while single-stack tests worked. Something on the path breaks dual-stack connections (DNS, firewall or a proxy).
+      offline: None of the test endpoints could be reached. The connection may be down, or a filter or extension blocks them.
+    probes:
+      v4: IPv4 (name with only an A record)
+      v6: IPv6 (name with only an AAAA record)
+      dual: Dual stack (A and AAAA)
+      v4literal: IPv4 without DNS (1.1.1.1)
+    errors:
+      timeout: Timed out
+      network: Failed
+      parse: Unexpected answer
+    columns:
+      test: Test
+      result: Result
+      ip: Your address
+      ms: Time
   provider-status:
     title: Provider status
     description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.

@@ -3916,6 +3916,39 @@ tools:
       hsts: HSTS (Strict-Transport-Security)
       http2: HTTP/2
       http3: HTTP/3 (QUIC)
+  ipv6-test:
+    title: IPv6-verbindingstest
+    description: Werkt IPv6 op de verbinding van deze browser? Bereikbaarheid over IPv4 en IPv6, welke dual-stacksites gebruiken, trage terugval door kapot IPv6 — met een score van 10, zoals test-ipv6.com.
+    intro: Je browser haalt kleine antwoorden op bij openbare testendpoints (ipify, Cloudflare) over IPv4, IPv6 en dual stack. Er gaat niets via de NET-TOOLS-server.
+    run: Opnieuw uitvoeren
+    result: Resultaat
+    details: Tests
+    scoreLabel: 'IPv6-gereedheid {score} van 10'
+    ok: 'OK via {family}'
+    prefersV6: Dual-stacksites worden via IPv6 bereikt.
+    prefersV4: Dual-stacksites worden via IPv4 bereikt, hoewel IPv6 werkt (browser of besturingssysteem geeft de voorkeur aan IPv4).
+    slowFallback: Dual-stacksites laden meer dan een seconde trager dan sites met alleen IPv4. IPv6 is waarschijnlijk ingesteld maar kapot, en de browser wacht voordat hij terugvalt op IPv4.
+    note: 'Een IPv6-adres zonder naam kan hier niet worden getest (browsers staan dat niet toe onder het contentbeveiligingsbeleid van deze pagina), en grote pakketten over IPv6 (MTU-problemen) ook niet. Klik op een adres om het netwerk op te zoeken.'
+    verdicts:
+      ipv6-ok: IPv6 en IPv4 werken allebei. Deze verbinding is klaar voor IPv6.
+      ipv4-only: Alleen IPv4 werkt. Sites zijn bereikbaar, maar deze verbinding heeft geen IPv6; vraag het je provider of controleer de router.
+      ipv6-only: Alleen IPv6 werkt direct; IPv4-sites worden bereikt via NAT64 of een vergelijkbare vertaling.
+      broken: De dual-stacktest mislukte terwijl de single-stacktests werkten. Iets op het pad breekt dual-stackverbindingen (DNS, firewall of een proxy).
+      offline: Geen van de testendpoints was bereikbaar. De verbinding is misschien weg, of een filter of extensie blokkeert ze.
+    probes:
+      v4: IPv4 (naam met alleen een A-record)
+      v6: IPv6 (naam met alleen een AAAA-record)
+      dual: Dual stack (A en AAAA)
+      v4literal: IPv4 zonder DNS (1.1.1.1)
+    errors:
+      timeout: Time-out
+      network: Mislukt
+      parse: Onverwacht antwoord
+    columns:
+      test: Test
+      result: Resultaat
+      ip: Jouw adres
+      ms: Tijd
   provider-status:
     title: Providerstatus
     description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.

@@ -121,7 +121,7 @@ Client IP for rate limiting comes from `X-Forwarded-For` **only if** the immedia
 
 `web`:
 - `nginxinc/nginx-unprivileged`, port 8080, read-only FS with tmpfs for cache/run.
-- Headers: `Content-Security-Policy` (`default-src 'self'; connect-src 'self' https://api.ipify.org https://api6.ipify.org https://cloudflare-dns.com https://dns.google ws: wss:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-<theme-script-hash>'; frame-ancestors 'none'`),
+- Headers: `Content-Security-Policy` (`default-src 'self'; connect-src 'self' https://api.ipify.org https://api6.ipify.org https://api64.ipify.org https://1.1.1.1 https://cloudflare-dns.com https://dns.google ws: wss:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-<theme-script-hash>'; frame-ancestors 'none'`),
   `ws: wss:` in connect-src is for the browser WebSocket tester (WEB-11): connections are opened only
   on an explicit user action and carry no NetTools credentials.
   `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy`,

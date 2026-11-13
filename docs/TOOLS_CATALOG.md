@@ -242,6 +242,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CLI-05 | DNS hijack & proxy check | Server resolver vs public DoH (filtering, NXDOMAIN hijacking); marker header for HTTP proxies | H | `/api/v1/echo`, `/api/v1/dns/lookup` | Cloudflare DoH *(browser-direct)* | 6 | ✅ |
 | CLI-06 | Provider status | Per public provider: key configured (never the key), requests, cache hits, errors, last problem since start | S | `/api/v1/providers/status` | — | 7 | ✅ |
 | CLI-07 | Report bundle | Collect result tables from any tool ("Add to report"), reorder, export Markdown / JSON / print-PDF; kept in the browser | B | `localStorage` | — | 7 | ✅ |
+| CLI-08 | IPv6 connection test | test-ipv6.com-style score for the browser's own connection: IPv4, IPv6, dual-stack preference, IPv4 without DNS, slow fallback from broken IPv6 | B | `fetch` to v4-only / v6-only / dual-stack endpoints | ipify (api, api6, api64), Cloudflare `1.1.1.1/cdn-cgi/trace` *(browser-direct)* | 8 | ✅ |
 
 ## 12. Status & Links
 
@@ -279,7 +280,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | PeeringDB — `www.peeringdb.com/api` | BGP-09 | Optional | Anonymous rate limits are low; cache |
 | crt.sh | TLS-08 | No | Can be slow; long timeout + cache |
 | Cloudflare / Google DoH | DNS-01 | No | Browser-direct OK |
-| ipify | IP-01, CLI-03 | No | Browser-direct OK |
+| ipify | IP-01, CLI-03, CLI-08 | No | Browser-direct OK |
 | ipinfo.io / ip-api.com | REP-01 | ipinfo token; ip-api free tier non-commercial | Prefer local mmdb |
 | Shodan InternetDB | REP-03, CON-06 | No | Passive data only |
 | AbuseIPDB | REP-02 | Yes | |

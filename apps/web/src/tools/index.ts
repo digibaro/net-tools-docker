@@ -80,6 +80,7 @@ import { tool as ipv6ExpandCompress } from './ipv6-expand-compress'
 import { tool as ipv6Neighbors } from './ipv6-neighbors'
 import { tool as ipv6Readiness } from './ipv6-readiness'
 import { tool as ipv6SubnetCalculator } from './ipv6-subnet-calculator'
+import { tool as ipv6Test } from './ipv6-test'
 import { tool as ipv6UlaGenerator } from './ipv6-ula-generator'
 import { tool as irrExpansion } from './irr-expansion'
 import { tool as isItDown } from './is-it-down'
@@ -185,7 +186,7 @@ const categories: { id: string, components: Tool[] }[] = [
   { id: 'reputation', components: [ipGeolocation, passiveExposure, ipReputation, torExitCheck, urlReputation] },
   { id: 'lan', components: [wakeOnLan, arpScan, mdnsBrowser, ssdpDiscovery, dhcpProbe, gatewayInfo, lldpNeighbors, ipv6Neighbors, dhcpv6Probe] },
   { id: 'calculators', components: [bandwidthCalculator, dataUnitConverter, bdpCalculator, mtuCalculator, portReference, protocolReference, dnsRecordTypes, subnetCheatSheet, wifiQrGenerator, opticalPower, wireguardConfig, routerSnippets, slaCalculator, voipBandwidthCalculator, packetDecoder, pcapViewer, poeBudgetCalculator, natCapacityCalculator, wirelessLinkCalculator, dscpConverter, configDiff, aclAnalyzer] },
-  { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, webrtcLeakTest, speedTest, dnsProxyCheck, providerStatus, reportBundle] },
+  { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, ipv6Test, webrtcLeakTest, speedTest, dnsProxyCheck, providerStatus, reportBundle] },
   { id: 'dashboard', components: [cloudStatus, quickLinks] },
 ]
 
