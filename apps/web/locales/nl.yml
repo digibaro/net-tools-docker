@@ -3895,6 +3895,27 @@ tools:
     other: Overig
     examples: Dit zijn voorbeeldlinks. De beheerder kan ze vervangen door een YAML-bestand (LINKS_FILE).
     none: Geen links gevonden voor dit filter.
+  domain-scorecard:
+    title: Domeinscore
+    description: Eén score voor een domein, zoals internet.nl — website (IPv6, HTTPS, TLS, doorverwijzing, beveiligingsheaders, HSTS, HTTP/2 en HTTP/3), e-mail (SPF, DMARC, MTA-STS, STARTTLS, DANE) en DNS (naamservers, DNSSEC, SOA, CAA).
+    run: Domein beoordelen
+    note: Combineert ongeveer 14 controles uit de web-, TLS-, e-mail- en DNS-tools, drie tegelijk uitgevoerd vanaf de NET-TOOLS-server; dit duurt tot een minuut. DKIM en reverse DNS van de mailserver staan in het e-mailbezorgingsrapport.
+    progress: '{done} van {total} controles klaar'
+    result: 'Domeinscore voor {domain}'
+    sections:
+      web: Website
+      mail: E-mail
+      dns: DNS
+    checks:
+      ipv6: IPv6 voor web-, mail- en naamservers
+      https: HTTPS met een geldig certificaat
+      tlsVersion: Onderhandelt TLS 1.3
+      certExpiry: 'Certificaat nog minstens 30 dagen geldig ({days} d)'
+      httpsRedirect: http:// verwijst door naar https://
+      headers: Beveiligingsheaders cijfer A of beter
+      hsts: HSTS (Strict-Transport-Security)
+      http2: HTTP/2
+      http3: HTTP/3 (QUIC)
   provider-status:
     title: Providerstatus
     description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.

@@ -52,6 +52,7 @@ import { tool as dnsTtlPlanner } from './dns-ttl-planner'
 import { tool as dnssecValidator } from './dnssec-validator'
 import { tool as domainExpiry } from './domain-expiry'
 import { tool as domainParser } from './domain-parser'
+import { tool as domainScorecard } from './domain-scorecard'
 import { tool as dscpConverter } from './dscp-converter'
 import { tool as ednsCompliance } from './edns-compliance'
 import { tool as emailDeliverabilityReport } from './email-deliverability-report'
@@ -177,7 +178,7 @@ const categories: { id: string, components: Tool[] }[] = [
   { id: 'ip', components: [ipv4SubnetCalculator, ipv6SubnetCalculator, cidrRangeConverter, cidrAggregator, subnetSplitter, ipInSubnet, ipv4FormatConverter, ipv6ExpandCompress, ipv6UlaGenerator, ipSpecialCheck, wildcardMaskCalculator, reverseDnsName, macAddressLookup, macFormatter, eui64Calculator, whatIsMyIp, vlsmPlanner, ipv4InIpv6, randomIpGenerator, ipv6AddressAnalyzer, ipamSheet, nat64Dns64Check, countryIpBlocks, subnetOverlapChecker] },
   { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance, dnsTtlPlanner, dnsHealthReport, bulkLookup] },
   { id: 'connectivity', components: [ping, tcpPing, traceroute, mtr, portCheck, ntpCheck, serverNetworkInfo, isItDown, latencyMatrix, pathMtu, ipv6Readiness, portScanner, iperf, snmp, latencyMonitor] },
-  { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder] },
+  { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder, domainScorecard] },
   { id: 'tls', components: [certificateDecoder, tlsInspector, tlsExpiry, csrTool, certKeyMatcher, ctSearch, starttlsCheck, revocationCheck, tlsScanner, sshAudit, keyConverter, daneChecker, certChainValidator, pkcs12Inspector, labCaGenerator] },
   { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer, emailDeliverabilityReport, m365DomainCheck] },
   { id: 'bgp', components: [ipToAsn, whoisLookup, rdapLookup, domainExpiry, asnInfo, prefixStatus, rpkiValidator, lookingGlass, peeringdbLookup, cloudIpLookup, irrExpansion, asPathVisualizer, bgpRouteHistory, asnNeighbourGraph, commonIxps, roaCoverage, prefixListTester, bgpCommunityDecoder] },

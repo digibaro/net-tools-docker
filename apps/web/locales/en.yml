@@ -3895,6 +3895,27 @@ tools:
     other: Other
     examples: These are example links. The administrator can replace them with a YAML file (LINKS_FILE).
     none: No links match the filter.
+  domain-scorecard:
+    title: Domain scorecard
+    description: One score for a domain, like internet.nl — website (IPv6, HTTPS, TLS, redirect, security headers, HSTS, HTTP/2 and HTTP/3), email (SPF, DMARC, MTA-STS, STARTTLS, DANE) and DNS (name servers, DNSSEC, SOA, CAA).
+    run: Score the domain
+    note: Combines about 14 checks from the web, TLS, email and DNS tools, run from the NET-TOOLS server three at a time; this takes up to a minute. DKIM and reverse DNS of the mail server are in the email deliverability report.
+    progress: '{done} of {total} checks done'
+    result: 'Scorecard for {domain}'
+    sections:
+      web: Website
+      mail: Email
+      dns: DNS
+    checks:
+      ipv6: IPv6 for web, mail and name servers
+      https: HTTPS with a valid certificate
+      tlsVersion: Negotiates TLS 1.3
+      certExpiry: 'Certificate valid for at least 30 days ({days} d)'
+      httpsRedirect: http:// redirects to https://
+      headers: Security headers grade A or better
+      hsts: HSTS (Strict-Transport-Security)
+      http2: HTTP/2
+      http3: HTTP/3 (QUIC)
   provider-status:
     title: Provider status
     description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.

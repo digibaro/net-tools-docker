@@ -117,6 +117,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | WEB-17 | Cache header analyzer | Cache-Control / Expires / validators / Vary (RFC 9111), browser vs shared TTL, conditional repeat | S | `net/http` | — | 6 | ✅ |
 | WEB-18 | Mixed content checker | http:// scripts, styles, frames, media and forms on an https page | S | `x/net/html` | — | 6 | ✅ |
 | WEB-19 | CSP builder & evaluator | Presets, nonce, evaluation (unsafe-inline, bypass hosts, object-src, base-uri…), header/nginx/Apache/meta | B | custom | — | 6 | ✅ |
+| WEB-20 | Domain scorecard | internet.nl-style score for a domain in three sections: website (IPv6, HTTPS + cert, TLS 1.3, http→https, security headers, HSTS, HTTP/2/3), email (SPF, DMARC, MTA-STS, STARTTLS, DANE) and DNS (NS, DNSSEC, SOA, CAA) | S | composed in the browser from existing endpoints, 3 at a time | — | 8 | ✅ |
 
 ## 5. TLS & Certificates
 
