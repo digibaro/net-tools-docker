@@ -697,6 +697,27 @@ paths:
                     properties:
                       data: { $ref: "#/components/schemas/EmailDkim" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/email/m365:
+    get:
+      operationId: emailM365
+      summary: Microsoft 365 DNS records and tenant discovery for a domain
+      tags: [email]
+      x-capability: email.m365
+      parameters:
+        - { name: domain, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/EmailM365" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/asn/lookup:
     get:
       operationId: asnLookup
@@ -2916,6 +2937,36 @@ components:
         revoked: { type: boolean }
         problems: { type: array, items: { type: string } }
         warnings: { type: array, items: { type: string } }
+    EmailM365:
+      type: object
+      required: [domain, tenant, checks, usesExchange]
+      properties:
+        domain: { type: string }
+        usesExchange: { type: boolean }
+        tenant:
+          type: object
+          required: [found, id, region, cloud, namespace, brand, federationHost, error]
+          properties:
+            found: { type: boolean }
+            id: { type: string }
+            region: { type: string }
+            cloud: { type: string }
+            namespace: { type: string, description: "Managed, Federated or Unknown" }
+            brand: { type: string }
+            federationHost: { type: string }
+            error: { type: string }
+        checks:
+          type: array
+          items:
+            type: object
+            required: [id, name, type, expected, found, status]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              type: { type: string }
+              expected: { type: string }
+              found: { type: array, items: { type: string } }
+              status: { type: string, enum: [pass, warn, fail, info] }
     AsnOrigin:
       type: object
       required: [asn, prefix, country, registry, allocated, asName]

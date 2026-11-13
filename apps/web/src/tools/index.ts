@@ -87,6 +87,7 @@ import { tool as latencyMatrix } from './latency-matrix'
 import { tool as latencyMonitor } from './latency-monitor'
 import { tool as lldpNeighbors } from './lldp-neighbors'
 import { tool as lookingGlass } from './looking-glass'
+import { tool as m365DomainCheck } from './m365-domain-check'
 import { tool as macAddressLookup } from './mac-address-lookup'
 import { tool as macFormatter } from './mac-formatter'
 import { tool as mdnsBrowser } from './mdns-browser'
@@ -176,7 +177,7 @@ const categories: { id: string, components: Tool[] }[] = [
   { id: 'connectivity', components: [ping, tcpPing, traceroute, mtr, portCheck, ntpCheck, serverNetworkInfo, isItDown, latencyMatrix, pathMtu, ipv6Readiness, portScanner, iperf, snmp, latencyMonitor] },
   { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder] },
   { id: 'tls', components: [certificateDecoder, tlsInspector, tlsExpiry, csrTool, certKeyMatcher, ctSearch, starttlsCheck, revocationCheck, tlsScanner, sshAudit, keyConverter, daneChecker, certChainValidator, pkcs12Inspector, labCaGenerator] },
-  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer, emailDeliverabilityReport] },
+  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer, emailDeliverabilityReport, m365DomainCheck] },
   { id: 'bgp', components: [ipToAsn, whoisLookup, rdapLookup, domainExpiry, asnInfo, prefixStatus, rpkiValidator, lookingGlass, peeringdbLookup, cloudIpLookup, irrExpansion, asPathVisualizer, bgpRouteHistory, asnNeighbourGraph, commonIxps, roaCoverage, prefixListTester, bgpCommunityDecoder] },
   { id: 'reputation', components: [ipGeolocation, passiveExposure, ipReputation, torExitCheck, urlReputation] },
   { id: 'lan', components: [wakeOnLan, arpScan, mdnsBrowser, ssdpDiscovery, dhcpProbe, gatewayInfo, lldpNeighbors, ipv6Neighbors, dhcpv6Probe] },

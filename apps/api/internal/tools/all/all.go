@@ -98,6 +98,7 @@ func Tools() []tools.Tool {
 		&email.DMARCTool{},
 		&email.DKIMTool{},
 		&email.MTASTSTool{},
+		&email.M365Tool{},
 		&asnlookup.Tool{},
 		&whois.Tool{},
 		&rdap.LookupTool{Svc: rdapSvc},

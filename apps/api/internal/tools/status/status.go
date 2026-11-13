@@ -26,6 +26,7 @@ var Known = []struct {
 	{"Google Safe Browsing", "SAFEBROWSING_KEY", false},
 	{"hstspreload.org", "", false},
 	{"ipinfo.io", "IPINFO_TOKEN", false},
+	{"Microsoft Entra ID", "", false},
 	{"Mozilla Observatory", "", false},
 	{"Onionoo", "", false},
 	{"PeeringDB", "PEERINGDB_KEY", true},

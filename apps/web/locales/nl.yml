@@ -3799,6 +3799,46 @@ tools:
       bimi: BIMI-record (merklogo)
       dane: DANE / TLSA voor de MX-hosts
       fcrdns: 'Reverse DNS van {host} bevestigt forward (FCrDNS)'
+  m365-domain-check:
+    title: Microsoft 365-domeincontrole
+    description: De DNS-records die Microsoft 365 nodig heeft (MX, SPF, Autodiscover, DKIM, DMARC, Intune, Teams) en de tenant achter een domein — ID, regio, beheerde of gefedereerde aanmelding.
+    run: Domein controleren
+    note: 'DNS wordt opgevraagd vanaf de NET-TOOLS-server; de tenant komt van de openbare aanmeld-discovery-endpoints van Microsoft (geen sleutel, geen aanmelding). Teams/Skype-records zijn alleen nodig voor oudere of hybride omgevingen.'
+    result: 'Microsoft 365-records voor {domain}'
+    tenant: Tenant
+    records: Records
+    notM365: '{domain} heeft geen Microsoft 365-tenant en de mail gaat niet naar Exchange Online. De records hieronder zijn alleen ter referentie.'
+    tenantError: 'Tenant opzoeken mislukt: {error}'
+    fields:
+      tenantId: Tenant-ID
+      brand: Organisatienaam
+      region: Regio
+      namespace: Aanmelding
+      federationHost: Federatieserver
+    namespace:
+      Managed: Beheerd (Microsoft Entra ID-accounts)
+      Federated: Gefedereerd (ADFS of een andere identiteitsprovider)
+      Unknown: Onbekend
+    columns:
+      name: Naam
+      type: Type
+      expected: Microsoft 365 verwacht
+      found: Gevonden
+    checks:
+      tenant: Microsoft 365-tenant gevonden
+      mx: MX wijst naar Exchange Online
+      spf: SPF bevat spf.protection.outlook.com
+      verification: Domeinverificatierecord (MS=)
+      autodiscover: Autodiscover-CNAME voor Outlook
+      dkim1: DKIM selector1-CNAME
+      dkim2: DKIM selector2-CNAME
+      dmarc: DMARC-record
+      enterpriseRegistration: Apparaatregistratie (enterpriseregistration)
+      enterpriseEnrollment: Intune-inschrijving (enterpriseenrollment)
+      lyncdiscover: Teams / Skype for Business (lyncdiscover)
+      sip: Teams / Skype for Business (sip)
+      sipTls: SIP SRV-record (_sip._tls)
+      sipFederation: SIP-federatie SRV-record (_sipfederationtls._tcp)
   provider-status:
     title: Providerstatus
     description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.

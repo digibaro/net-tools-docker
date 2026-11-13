@@ -3799,6 +3799,46 @@ tools:
       bimi: BIMI record (brand logo)
       dane: DANE / TLSA for the MX hosts
       fcrdns: 'Reverse DNS of {host} confirms forward (FCrDNS)'
+  m365-domain-check:
+    title: Microsoft 365 domain check
+    description: The DNS records Microsoft 365 needs (MX, SPF, Autodiscover, DKIM, DMARC, Intune, Teams) and the tenant behind a domain — ID, region, managed or federated sign-in.
+    run: Check the domain
+    note: 'DNS is resolved from the NET-TOOLS server; the tenant comes from Microsoft''s public sign-in discovery endpoints (no key, no sign-in). Teams/Skype records are only needed for older or hybrid setups.'
+    result: 'Microsoft 365 records for {domain}'
+    tenant: Tenant
+    records: Records
+    notM365: '{domain} has no Microsoft 365 tenant and its mail does not go to Exchange Online. The records below are shown for reference only.'
+    tenantError: 'Tenant lookup failed: {error}'
+    fields:
+      tenantId: Tenant ID
+      brand: Organisation name
+      region: Region
+      namespace: Sign-in
+      federationHost: Federation server
+    namespace:
+      Managed: Managed (Microsoft Entra ID accounts)
+      Federated: Federated (ADFS or another identity provider)
+      Unknown: Unknown
+    columns:
+      name: Name
+      type: Type
+      expected: Microsoft 365 expects
+      found: Found
+    checks:
+      tenant: Microsoft 365 tenant found
+      mx: MX points to Exchange Online
+      spf: SPF includes spf.protection.outlook.com
+      verification: Domain verification record (MS=)
+      autodiscover: Autodiscover CNAME for Outlook
+      dkim1: DKIM selector1 CNAME
+      dkim2: DKIM selector2 CNAME
+      dmarc: DMARC record
+      enterpriseRegistration: Device registration (enterpriseregistration)
+      enterpriseEnrollment: Intune enrolment (enterpriseenrollment)
+      lyncdiscover: Teams / Skype for Business (lyncdiscover)
+      sip: Teams / Skype for Business (sip)
+      sipTls: SIP SRV record (_sip._tls)
+      sipFederation: SIP federation SRV record (_sipfederationtls._tcp)
   provider-status:
     title: Provider status
     description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.

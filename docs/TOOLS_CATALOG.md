@@ -154,6 +154,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | EM-10 | SMTP banner & FCrDNS | PTR, forward confirmation, banner and EHLO name vs PTR, STARTTLS | S | `miekg/dns`, `net/smtp`-style probe | — | 6 | ✅ |
 | EM-11 | TLS-RPT report viewer | RFC 8460 reports (JSON / gzip): success rate, failures by type and MX | B | `fflate` | — | 7 | ✅ |
 | EM-12 | Email deliverability report | MX/STARTTLS, SPF, DKIM, DMARC, MTA-STS, TLS-RPT, BIMI, DANE, FCrDNS — graded | S | composed from email tools | — | 7 | ✅ |
+| EM-13 | Microsoft 365 domain check | Records Microsoft 365 needs (MX, SPF, MS= verification, Autodiscover, DKIM selector1/2, DMARC, Intune, Teams/SIP) vs what DNS returns; tenant ID, region, managed or federated sign-in | S+P | `miekg/dns` lookups | Microsoft Entra OpenID discovery + `getuserrealm.srf` (keyless) | 8 | ✅ |
 
 ## 7. Routing, BGP & Registry
 
@@ -276,6 +277,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | AbuseIPDB | REP-02 | Yes | |
 | Mozilla HTTP Observatory | WEB-04 | No | |
 | hstspreload.org | WEB-10 | No | |
+| Microsoft Entra ID — `login.microsoftonline.com` (OpenID discovery, `getuserrealm.srf`) | EM-13 | No | Tenant ID, region, managed/federated; dummy probe login, cached 1 h |
 | SSL Labs API v4 | TLS-03 | Registration (email) | Slow; async polling |
 | check-host.net | CON-05, CON-10 | No | Alternative multi-location checks |
 | macvendors.com | IP-16 | No (rate-limited) | Fallback only; bundled OUI preferred |

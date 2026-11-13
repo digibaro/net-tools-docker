@@ -582,6 +582,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/email/m365": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Microsoft 365 DNS records and tenant discovery for a domain */
+        get: operations["emailM365"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/asn/lookup": {
         parameters: {
             query?: never;
@@ -2410,6 +2427,30 @@ export interface components {
             revoked: boolean;
             problems: string[];
             warnings: string[];
+        };
+        EmailM365: {
+            domain: string;
+            usesExchange: boolean;
+            tenant: {
+                found: boolean;
+                id: string;
+                region: string;
+                cloud: string;
+                /** @description Managed, Federated or Unknown */
+                namespace: string;
+                brand: string;
+                federationHost: string;
+                error: string;
+            };
+            checks: {
+                id: string;
+                name: string;
+                type: string;
+                expected: string;
+                found: string[];
+                /** @enum {string} */
+                status: "pass" | "warn" | "fail" | "info";
+            }[];
         };
         AsnOrigin: {
             asn: number;
@@ -4676,6 +4717,31 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OkEnvelope"] & {
                         data: components["schemas"]["EmailDkim"];
+                    };
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    emailM365: {
+        parameters: {
+            query: {
+                domain: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkEnvelope"] & {
+                        data: components["schemas"]["EmailM365"];
                     };
                 };
             };
