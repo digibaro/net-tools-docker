@@ -5,6 +5,7 @@ import (
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/asnlookup"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/cloudranges"
+	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/cloudstatus"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/ctsearch"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/dane"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/dns64"
@@ -29,6 +30,7 @@ import (
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/irr"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/lan"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/latmatrix"
+	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/links"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/mtr"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/ntpcheck"
 	"github.com/digibaro/net-tools-docker/apps/api/internal/tools/observatory"
@@ -63,6 +65,8 @@ func Tools() []tools.Tool {
 	rdapSvc := &rdap.Service{}
 	return []tools.Tool{
 		&status.Tool{},
+		&cloudstatus.Tool{},
+		&links.Tool{},
 		&dnslookup.Tool{},
 		&dns64.Tool{},
 		&openresolver.Tool{},
@@ -98,6 +102,7 @@ func Tools() []tools.Tool {
 		&email.DMARCTool{},
 		&email.DKIMTool{},
 		&email.MTASTSTool{},
+		&email.M365Tool{},
 		&asnlookup.Tool{},
 		&whois.Tool{},
 		&rdap.LookupTool{Svc: rdapSvc},

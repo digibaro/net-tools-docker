@@ -24,6 +24,10 @@ RUN find apps/web/dist -type f \( -name '*.js' -o -name '*.css' -o -name '*.html
       -o -name '*.json' -o -name '*.webmanifest' -o -name '*.txt' \) -size +1k -exec gzip -9 -k -n {} +
 
 FROM nginxinc/nginx-unprivileged:stable-alpine
+# The upstream image can lag behind Alpine security fixes (Trivy gate); install them at build time.
+USER root
+RUN apk upgrade --no-cache
+USER 101
 # official nginx images render /etc/nginx/templates/*.template with envsubst at start
 COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /src/security-headers.conf /etc/nginx/snippets/security-headers.conf

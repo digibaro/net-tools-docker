@@ -117,6 +117,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | WEB-17 | Cache header analyzer | Cache-Control / Expires / validators / Vary (RFC 9111), browser vs shared TTL, conditional repeat | S | `net/http` | — | 6 | ✅ |
 | WEB-18 | Mixed content checker | http:// scripts, styles, frames, media and forms on an https page | S | `x/net/html` | — | 6 | ✅ |
 | WEB-19 | CSP builder & evaluator | Presets, nonce, evaluation (unsafe-inline, bypass hosts, object-src, base-uri…), header/nginx/Apache/meta | B | custom | — | 6 | ✅ |
+| WEB-20 | Domain scorecard | internet.nl-style score for a domain in three sections: website (IPv6, HTTPS + cert, TLS 1.3, http→https, security headers, HSTS, HTTP/2/3), email (SPF, DMARC, MTA-STS, STARTTLS, DANE) and DNS (NS, DNSSEC, SOA, CAA) | S | composed in the browser from existing endpoints, 3 at a time | — | 8 | ✅ |
 
 ## 5. TLS & Certificates
 
@@ -154,6 +155,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | EM-10 | SMTP banner & FCrDNS | PTR, forward confirmation, banner and EHLO name vs PTR, STARTTLS | S | `miekg/dns`, `net/smtp`-style probe | — | 6 | ✅ |
 | EM-11 | TLS-RPT report viewer | RFC 8460 reports (JSON / gzip): success rate, failures by type and MX | B | `fflate` | — | 7 | ✅ |
 | EM-12 | Email deliverability report | MX/STARTTLS, SPF, DKIM, DMARC, MTA-STS, TLS-RPT, BIMI, DANE, FCrDNS — graded | S | composed from email tools | — | 7 | ✅ |
+| EM-13 | Microsoft 365 domain check | Records Microsoft 365 needs (MX, SPF, MS= verification, Autodiscover, DKIM selector1/2, DMARC, Intune, Teams/SIP) vs what DNS returns; tenant ID, region, managed or federated sign-in | S+P | `miekg/dns` lookups | Microsoft Entra OpenID discovery + `getuserrealm.srf` (keyless) | 8 | ✅ |
 
 ## 7. Routing, BGP & Registry
 
@@ -240,6 +242,14 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CLI-05 | DNS hijack & proxy check | Server resolver vs public DoH (filtering, NXDOMAIN hijacking); marker header for HTTP proxies | H | `/api/v1/echo`, `/api/v1/dns/lookup` | Cloudflare DoH *(browser-direct)* | 6 | ✅ |
 | CLI-06 | Provider status | Per public provider: key configured (never the key), requests, cache hits, errors, last problem since start | S | `/api/v1/providers/status` | — | 7 | ✅ |
 | CLI-07 | Report bundle | Collect result tables from any tool ("Add to report"), reorder, export Markdown / JSON / print-PDF; kept in the browser | B | `localStorage` | — | 7 | ✅ |
+| CLI-08 | IPv6 connection test | test-ipv6.com-style score for the browser's own connection: IPv4, IPv6, dual-stack preference, IPv4 without DNS, slow fallback from broken IPv6 | B | `fetch` to v4-only / v6-only / dual-stack endpoints | ipify (api, api6, api64), Cloudflare `1.1.1.1/cdn-cgi/trace` *(browser-direct)* | 8 | ✅ |
+
+## 12. Status & Links
+
+| ID | Tool | What it does | Run | Local implementation | Public API option | Phase | Status |
+|---|---|---|---|---|---|---|---|
+| DASH-01 | Cloud service status | Current incidents / maintenance of Microsoft 365, Azure, Google Workspace & Cloud, AWS, Cloudflare, GitHub, OpenAI, Claude, Slack, Zoom, … — problems first, auto-refresh; list replaceable via `STATUS_FEEDS_FILE` / `data/status-feeds.yml` | P | parsers for Statuspage, Google, AWS Health (UTF-16), RSS/Atom, M365 consumer, Slack | public status feeds (keyless), cached 2 min | 8 | ✅ |
+| DASH-02 | Quick links | Admin-maintained links (portals, control panels, outage pages), grouped and filterable; `LINKS_FILE` / `data/links.yml`, http(s) only | S | YAML file read at start-up | — | 8 | ✅ |
 
 ---
 
@@ -270,12 +280,14 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | PeeringDB — `www.peeringdb.com/api` | BGP-09 | Optional | Anonymous rate limits are low; cache |
 | crt.sh | TLS-08 | No | Can be slow; long timeout + cache |
 | Cloudflare / Google DoH | DNS-01 | No | Browser-direct OK |
-| ipify | IP-01, CLI-03 | No | Browser-direct OK |
+| ipify | IP-01, CLI-03, CLI-08 | No | Browser-direct OK |
 | ipinfo.io / ip-api.com | REP-01 | ipinfo token; ip-api free tier non-commercial | Prefer local mmdb |
 | Shodan InternetDB | REP-03, CON-06 | No | Passive data only |
 | AbuseIPDB | REP-02 | Yes | |
 | Mozilla HTTP Observatory | WEB-04 | No | |
 | hstspreload.org | WEB-10 | No | |
+| Status feeds — Statuspage `summary.json`, Google `incidents.json`, AWS Health `currentevents`, Azure RSS, `status.cloud.microsoft`, Slack | DASH-01 | No | One provider entry for all feeds; cached 2 min; https only |
+| Microsoft Entra ID — `login.microsoftonline.com` (OpenID discovery, `getuserrealm.srf`) | EM-13 | No | Tenant ID, region, managed/federated; dummy probe login, cached 1 h |
 | SSL Labs API v4 | TLS-03 | Registration (email) | Slow; async polling |
 | check-host.net | CON-05, CON-10 | No | Alternative multi-location checks |
 | macvendors.com | IP-16 | No (rate-limited) | Fallback only; bundled OUI preferred |

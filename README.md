@@ -1,6 +1,6 @@
 # NET-TOOLS
 
-Self-hosted network tools and troubleshooting utilities in one web app — 168 tools for IP
+Self-hosted network tools and troubleshooting utilities in one web app — 173 tools for IP
 addressing, DNS, connectivity, HTTP, TLS, email, BGP, reputation and your LAN. The UX follows
 [it-tools](https://github.com/CorentinTh/it-tools): a searchable grid of tools, each on its own
 page, light / dark / auto theme, shareable links. Ships as two Docker containers.
@@ -170,6 +170,12 @@ Read them with `docker compose logs api`; filter the audit trail with `| grep '"
 
 IP geolocation works offline with a MaxMind GeoLite2 or DB-IP Lite database placed in `data/`
 (mounted read-only). See [data/README.md](data/README.md).
+
+### Status feeds and quick links
+
+The *Status & Links* tools show public cloud status feeds and a list of links. Both lists can be
+replaced with a YAML file in `data/` (`status-feeds.yml`, `links.yml`) or with
+`STATUS_FEEDS_FILE` / `LINKS_FILE`. See [data/README.md](data/README.md).
 
 ## Optional services
 

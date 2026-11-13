@@ -1,0 +1,26 @@
+# Cloud status feeds (Status & Links → Cloud service status). Copy to data/status-feeds.yml (or
+# point STATUS_FEEDS_FILE at another file) and restart the api container. The file replaces the
+# built-in list; start from the defaults below and add or remove entries. At most 60 feeds.
+#
+# kind      feed URL
+# --------  -------------------------------------------------------------------------------
+# statuspage  <status page>/api/v2/summary.json (Atlassian Statuspage and incident.io pages)
+# google      https://www.google.com/appsstatus/dashboard/incidents.json, status.cloud.google.com/incidents.json
+# aws         https://health.aws.amazon.com/public/currentevents
+# rss         any RSS 2.0 / Atom feed that lists only current incidents (Azure)
+# m365consumer  https://status.cloud.microsoft/api/posts/<workload>
+# slack       https://slack-status.com/api/v2.0.0/current
+# link        no feed: shown as a link to the status page only
+#
+# id: lower-case letters, digits and dashes; page and feed must be https.
+feeds:
+  - { id: m365, name: Microsoft 365 (consumer), kind: m365consumer, group: microsoft, page: "https://status.cloud.microsoft/", feed: "https://status.cloud.microsoft/api/posts/m365Consumer" }
+  - { id: m365-admin, name: Microsoft 365 (your tenant), kind: link, group: microsoft, page: "https://admin.microsoft.com/#/servicehealth" }
+  - { id: azure, name: Microsoft Azure, kind: rss, group: microsoft, page: "https://azure.status.microsoft/en-us/status", feed: "https://azure.status.microsoft/en-us/status/feed/" }
+  - { id: google-workspace, name: Google Workspace, kind: google, group: google, page: "https://www.google.com/appsstatus/dashboard/", feed: "https://www.google.com/appsstatus/dashboard/incidents.json" }
+  - { id: aws, name: Amazon Web Services, kind: aws, group: cloud, page: "https://health.aws.amazon.com/health/status", feed: "https://health.aws.amazon.com/public/currentevents" }
+  - { id: cloudflare, name: Cloudflare, kind: statuspage, group: cloud, page: "https://www.cloudflarestatus.com", feed: "https://www.cloudflarestatus.com/api/v2/summary.json" }
+  - { id: github, name: GitHub, kind: statuspage, group: dev, page: "https://www.githubstatus.com", feed: "https://www.githubstatus.com/api/v2/summary.json" }
+  - { id: openai, name: OpenAI, kind: statuspage, group: ai, page: "https://status.openai.com", feed: "https://status.openai.com/api/v2/summary.json" }
+  - { id: slack, name: Slack, kind: slack, group: collab, page: "https://slack-status.com/", feed: "https://slack-status.com/api/v2.0.0/current" }
+  - { id: meta, name: WhatsApp / Meta, kind: link, group: collab, page: "https://metastatus.com/" }

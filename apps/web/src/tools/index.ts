@@ -21,6 +21,7 @@ import { tool as certificateDecoder } from './certificate-decoder'
 import { tool as cidrAggregator } from './cidr-aggregator'
 import { tool as cidrRangeConverter } from './cidr-range-converter'
 import { tool as cloudIpLookup } from './cloud-ip-lookup'
+import { tool as cloudStatus } from './cloud-status'
 import { tool as commonIxps } from './common-ixps'
 import { tool as compressionCheck } from './compression-check'
 import { tool as configDiff } from './config-diff'
@@ -51,6 +52,7 @@ import { tool as dnsTtlPlanner } from './dns-ttl-planner'
 import { tool as dnssecValidator } from './dnssec-validator'
 import { tool as domainExpiry } from './domain-expiry'
 import { tool as domainParser } from './domain-parser'
+import { tool as domainScorecard } from './domain-scorecard'
 import { tool as dscpConverter } from './dscp-converter'
 import { tool as ednsCompliance } from './edns-compliance'
 import { tool as emailDeliverabilityReport } from './email-deliverability-report'
@@ -78,6 +80,7 @@ import { tool as ipv6ExpandCompress } from './ipv6-expand-compress'
 import { tool as ipv6Neighbors } from './ipv6-neighbors'
 import { tool as ipv6Readiness } from './ipv6-readiness'
 import { tool as ipv6SubnetCalculator } from './ipv6-subnet-calculator'
+import { tool as ipv6Test } from './ipv6-test'
 import { tool as ipv6UlaGenerator } from './ipv6-ula-generator'
 import { tool as irrExpansion } from './irr-expansion'
 import { tool as isItDown } from './is-it-down'
@@ -87,6 +90,7 @@ import { tool as latencyMatrix } from './latency-matrix'
 import { tool as latencyMonitor } from './latency-monitor'
 import { tool as lldpNeighbors } from './lldp-neighbors'
 import { tool as lookingGlass } from './looking-glass'
+import { tool as m365DomainCheck } from './m365-domain-check'
 import { tool as macAddressLookup } from './mac-address-lookup'
 import { tool as macFormatter } from './mac-formatter'
 import { tool as mdnsBrowser } from './mdns-browser'
@@ -118,6 +122,7 @@ import { tool as protocolReference } from './protocol-reference'
 import { tool as providerStatus } from './provider-status'
 import { tool as ptrCoverage } from './ptr-coverage'
 import { tool as punycodeConverter } from './punycode-converter'
+import { tool as quickLinks } from './quick-links'
 import { tool as randomIpGenerator } from './random-ip-generator'
 import { tool as rdapLookup } from './rdap-lookup'
 import { tool as redirectTracer } from './redirect-tracer'
@@ -174,14 +179,15 @@ const categories: { id: string, components: Tool[] }[] = [
   { id: 'ip', components: [ipv4SubnetCalculator, ipv6SubnetCalculator, cidrRangeConverter, cidrAggregator, subnetSplitter, ipInSubnet, ipv4FormatConverter, ipv6ExpandCompress, ipv6UlaGenerator, ipSpecialCheck, wildcardMaskCalculator, reverseDnsName, macAddressLookup, macFormatter, eui64Calculator, whatIsMyIp, vlsmPlanner, ipv4InIpv6, randomIpGenerator, ipv6AddressAnalyzer, ipamSheet, nat64Dns64Check, countryIpBlocks, subnetOverlapChecker] },
   { id: 'dns', components: [punycodeConverter, domainParser, dnsLookup, reverseDns, caaChecker, dnsConsistency, dnsPropagation, dnsTrace, encryptedDnsTester, zoneBuilder, zoneTransferTest, wildcardDetector, dnsBenchmark, dnssecValidator, openResolverTest, ptrCoverage, svcbHttpsViewer, ednsCompliance, dnsTtlPlanner, dnsHealthReport, bulkLookup] },
   { id: 'connectivity', components: [ping, tcpPing, traceroute, mtr, portCheck, ntpCheck, serverNetworkInfo, isItDown, latencyMatrix, pathMtu, ipv6Readiness, portScanner, iperf, snmp, latencyMonitor] },
-  { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder] },
+  { id: 'web', components: [urlParser, userAgentParser, httpStatusCodes, httpRequest, redirectTracer, httpTiming, securityHeaders, corsTester, hstsPreload, compressionCheck, cookieInspector, wellKnownFiles, httpProtocols, curlBuilder, websocketTester, cdnWafDetector, cacheHeaderAnalyzer, mixedContentChecker, cspBuilder, domainScorecard] },
   { id: 'tls', components: [certificateDecoder, tlsInspector, tlsExpiry, csrTool, certKeyMatcher, ctSearch, starttlsCheck, revocationCheck, tlsScanner, sshAudit, keyConverter, daneChecker, certChainValidator, pkcs12Inspector, labCaGenerator] },
-  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer, emailDeliverabilityReport] },
+  { id: 'email', components: [mxLookup, spfChecker, dmarcChecker, dkimChecker, emailHeaderAnalyzer, blacklistCheck, mtaStsChecker, openRelayTest, dmarcReportViewer, smtpBannerCheck, tlsRptViewer, emailDeliverabilityReport, m365DomainCheck] },
   { id: 'bgp', components: [ipToAsn, whoisLookup, rdapLookup, domainExpiry, asnInfo, prefixStatus, rpkiValidator, lookingGlass, peeringdbLookup, cloudIpLookup, irrExpansion, asPathVisualizer, bgpRouteHistory, asnNeighbourGraph, commonIxps, roaCoverage, prefixListTester, bgpCommunityDecoder] },
   { id: 'reputation', components: [ipGeolocation, passiveExposure, ipReputation, torExitCheck, urlReputation] },
   { id: 'lan', components: [wakeOnLan, arpScan, mdnsBrowser, ssdpDiscovery, dhcpProbe, gatewayInfo, lldpNeighbors, ipv6Neighbors, dhcpv6Probe] },
   { id: 'calculators', components: [bandwidthCalculator, dataUnitConverter, bdpCalculator, mtuCalculator, portReference, protocolReference, dnsRecordTypes, subnetCheatSheet, wifiQrGenerator, opticalPower, wireguardConfig, routerSnippets, slaCalculator, voipBandwidthCalculator, packetDecoder, pcapViewer, poeBudgetCalculator, natCapacityCalculator, wirelessLinkCalculator, dscpConverter, configDiff, aclAnalyzer] },
-  { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, webrtcLeakTest, speedTest, dnsProxyCheck, providerStatus, reportBundle] },
+  { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, ipv6Test, webrtcLeakTest, speedTest, dnsProxyCheck, providerStatus, reportBundle] },
+  { id: 'dashboard', components: [cloudStatus, quickLinks] },
 ]
 
 export const toolsByCategory: ToolCategory[] = categories

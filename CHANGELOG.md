@@ -6,6 +6,29 @@ instructions are on the [GitHub releases page](https://github.com/digibaro/net-t
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-13
+
+### Added
+- 5 new tools (173 in total):
+  - Email: Microsoft 365 domain check (DNS records Microsoft 365 expects, tenant ID, region and
+    managed/federated sign-in).
+  - HTTP: domain scorecard (internet.nl-style grade for website, email and DNS).
+  - Client: IPv6 connection test (scores the visitor's own connection out of 10).
+  - New category "Status & links": cloud service status (16 public status sources;
+    `STATUS_FEEDS_FILE`) and quick links (`LINKS_FILE`).
+- Smart search: typing an IP, domain, URL, ASN, prefix, email or MAC address in Ctrl+K lists the
+  tools that take it, filled in, plus external lookup sites.
+- "Look up elsewhere" menu on tool pages (Shodan, VirusTotal, crt.sh, DNSViz, Internet.nl,
+  bgp.tools and more); the external sites can be switched off under Settings → Privacy.
+
+### Fixed
+- DNS health report and email deliverability report: sub-checks run at most 3 at a time, so they
+  are no longer refused by the per-visitor concurrency limit and shown as "skipped".
+
+### Security
+- node-forge 1.4.3, golang.org/x/net 0.62.0, Go 1.27.4; the web image installs Alpine security
+  updates (brotli CVE-2026-111497).
+
 ## [0.7.0] - 2026-10-26
 
 ### Added

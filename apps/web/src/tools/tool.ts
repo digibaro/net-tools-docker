@@ -1,4 +1,5 @@
 import type { Component } from 'vue'
+import type { TargetKind } from './targets'
 import { translate } from '@/plugins/i18n.plugin'
 
 export type RunMode = 'browser' | 'server' | 'public-api' | 'hybrid'
@@ -22,6 +23,11 @@ export interface ToolDefinition {
   /** Public providers offered as an option, e.g. ['globalping']. */
   providers?: string[]
   requiresLan?: boolean
+  /**
+   * Query parameter that takes each kind of target, e.g. `{ domain: 'name' }`. Drives the quick
+   * actions in the search palette and the external lookup links on the tool page.
+   */
+  accepts?: Partial<Record<TargetKind, string>>
 }
 
 export interface Tool extends ToolDefinition {

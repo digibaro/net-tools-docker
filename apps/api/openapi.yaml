@@ -697,6 +697,65 @@ paths:
                     properties:
                       data: { $ref: "#/components/schemas/EmailDkim" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/email/m365:
+    get:
+      operationId: emailM365
+      summary: Microsoft 365 DNS records and tenant discovery for a domain
+      tags: [email]
+      x-capability: email.m365
+      parameters:
+        - { name: domain, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/EmailM365" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/status/cloud:
+    get:
+      operationId: cloudStatus
+      summary: Current state of cloud services from their public status feeds
+      tags: [dashboard]
+      x-capability: status.cloud
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/CloudStatus" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/links:
+    get:
+      operationId: quickLinks
+      summary: Admin-maintained quick links (LINKS_FILE)
+      tags: [dashboard]
+      x-capability: dash.links
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkEnvelope"
+                  - type: object
+                    required: [data]
+                    properties:
+                      data: { $ref: "#/components/schemas/QuickLinks" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/asn/lookup:
     get:
       operationId: asnLookup
@@ -2916,6 +2975,84 @@ components:
         revoked: { type: boolean }
         problems: { type: array, items: { type: string } }
         warnings: { type: array, items: { type: string } }
+    EmailM365:
+      type: object
+      required: [domain, tenant, checks, usesExchange]
+      properties:
+        domain: { type: string }
+        usesExchange: { type: boolean }
+        tenant:
+          type: object
+          required: [found, id, region, cloud, namespace, brand, federationHost, error]
+          properties:
+            found: { type: boolean }
+            id: { type: string }
+            region: { type: string }
+            cloud: { type: string }
+            namespace: { type: string, description: "Managed, Federated or Unknown" }
+            brand: { type: string }
+            federationHost: { type: string }
+            error: { type: string }
+        checks:
+          type: array
+          items:
+            type: object
+            required: [id, name, type, expected, found, status]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              type: { type: string }
+              expected: { type: string }
+              found: { type: array, items: { type: string } }
+              status: { type: string, enum: [pass, warn, fail, info] }
+    CloudStatus:
+      type: object
+      required: [checkedAt, services, configError]
+      properties:
+        checkedAt: { type: string, format: date-time }
+        configError: { type: string }
+        services:
+          type: array
+          items:
+            type: object
+            required: [id, name, group, kind, page, state, incidents, components, error]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              group: { type: string }
+              kind: { type: string, enum: [statuspage, google, aws, rss, m365consumer, slack, link] }
+              page: { type: string }
+              state: { type: string, enum: [operational, maintenance, degraded, outage, unknown, link] }
+              error: { type: string }
+              components: { type: array, items: { type: string } }
+              incidents:
+                type: array
+                items:
+                  type: object
+                  required: [title, impact, status, started, updated, url]
+                  properties:
+                    title: { type: string }
+                    impact: { type: string, enum: [outage, degraded, maintenance, info] }
+                    status: { type: string }
+                    started: { type: string }
+                    updated: { type: string }
+                    url: { type: string }
+    QuickLinks:
+      type: object
+      required: [links, custom, configError]
+      properties:
+        custom: { type: boolean, description: false while the built-in examples are shown }
+        configError: { type: string }
+        links:
+          type: array
+          items:
+            type: object
+            required: [name, url, description, group]
+            properties:
+              name: { type: string }
+              url: { type: string }
+              description: { type: string }
+              group: { type: string }
     AsnOrigin:
       type: object
       required: [asn, prefix, country, registry, allocated, asName]

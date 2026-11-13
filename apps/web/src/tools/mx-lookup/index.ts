@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-13'),
   runMode: 'server',
   capability: 'email.mx',
+  accepts: { domain: 'domain' },
 })

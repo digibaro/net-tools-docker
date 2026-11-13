@@ -19,6 +19,10 @@ search:
   open: Tools zoeken
   placeholder: Tools zoeken…
   noResults: Geen tools gevonden
+  placeholderTarget: Zoek tools, of typ een IP, domein, URL, ASN of prefix…
+  runFor: 'Uitvoeren voor {value}'
+  openIn: 'Openen in {site}'
+  external: Extern opzoeken
 theme:
   accent: Accentkleur
   accents:
@@ -54,6 +58,7 @@ categories:
   lan: LAN
   calculators: Rekenhulpen & naslag
   client: Clientdiagnose
+  dashboard: Status & links
 runMode:
   browser:
     label: Browser
@@ -123,11 +128,26 @@ common:
   none: Geen
   result: Resultaat
   invalid: Ongeldige waarde
+targets:
+  ip: IP-adres
+  domain: Domein
+  url: URL
+  asn: AS-nummer
+  prefix: Prefix
+  email: E-mailadres
+  mac: MAC-adres
+pivot:
+  button: Elders opzoeken
+  tools: Andere NET-TOOLS
+  external: Externe sites
 settings:
   appearance: Weergave
   language: Taal
   favoritesCount: 'Je hebt {count} favoriete tools.'
   clearFavorites: Alle favorieten verwijderen
+  privacy: Privacy
+  externalLinks: Links naar externe opzoeksites tonen
+  externalLinksHelp: Biedt Shodan, VirusTotal, crt.sh, bgp.tools en vergelijkbare sites aan voor het IP-adres, domein of ASN dat je bekijkt. Er wordt niets verstuurd tot je op een link klikt; die site krijgt dan dat doel.
 about:
   intro: NET-TOOLS bundelt netwerktools en hulpmiddelen voor troubleshooting in één zelfgehoste app.
   build: Build
@@ -3799,6 +3819,137 @@ tools:
       bimi: BIMI-record (merklogo)
       dane: DANE / TLSA voor de MX-hosts
       fcrdns: 'Reverse DNS van {host} bevestigt forward (FCrDNS)'
+  m365-domain-check:
+    title: Microsoft 365-domeincontrole
+    description: De DNS-records die Microsoft 365 nodig heeft (MX, SPF, Autodiscover, DKIM, DMARC, Intune, Teams) en de tenant achter een domein — ID, regio, beheerde of gefedereerde aanmelding.
+    run: Domein controleren
+    note: 'DNS wordt opgevraagd vanaf de NET-TOOLS-server; de tenant komt van de openbare aanmeld-discovery-endpoints van Microsoft (geen sleutel, geen aanmelding). Teams/Skype-records zijn alleen nodig voor oudere of hybride omgevingen.'
+    result: 'Microsoft 365-records voor {domain}'
+    tenant: Tenant
+    records: Records
+    notM365: '{domain} heeft geen Microsoft 365-tenant en de mail gaat niet naar Exchange Online. De records hieronder zijn alleen ter referentie.'
+    tenantError: 'Tenant opzoeken mislukt: {error}'
+    fields:
+      tenantId: Tenant-ID
+      brand: Organisatienaam
+      region: Regio
+      namespace: Aanmelding
+      federationHost: Federatieserver
+    namespace:
+      Managed: Beheerd (Microsoft Entra ID-accounts)
+      Federated: Gefedereerd (ADFS of een andere identiteitsprovider)
+      Unknown: Onbekend
+    columns:
+      name: Naam
+      type: Type
+      expected: Microsoft 365 verwacht
+      found: Gevonden
+    checks:
+      tenant: Microsoft 365-tenant gevonden
+      mx: MX wijst naar Exchange Online
+      spf: SPF bevat spf.protection.outlook.com
+      verification: Domeinverificatierecord (MS=)
+      autodiscover: Autodiscover-CNAME voor Outlook
+      dkim1: DKIM selector1-CNAME
+      dkim2: DKIM selector2-CNAME
+      dmarc: DMARC-record
+      enterpriseRegistration: Apparaatregistratie (enterpriseregistration)
+      enterpriseEnrollment: Intune-inschrijving (enterpriseenrollment)
+      lyncdiscover: Teams / Skype for Business (lyncdiscover)
+      sip: Teams / Skype for Business (sip)
+      sipTls: SIP SRV-record (_sip._tls)
+      sipFederation: SIP-federatie SRV-record (_sipfederationtls._tcp)
+  cloud-status:
+    title: Status clouddiensten
+    description: Actuele storingen en onderhoud bij Microsoft 365, Azure, Google Workspace, AWS, Cloudflare, GitHub, OpenAI, Slack en meer — uit hun openbare statusfeeds, problemen bovenaan.
+    refresh: Vernieuwen
+    auto: Elke 2 minuten vernieuwen
+    problemsOnly: Alleen problemen
+    filter: Diensten of storingen filteren
+    note: Door de NET-TOOLS-server opgehaald uit de openbare statusfeed van elke aanbieder en 2 minuten gecachet. De lijst is aan te passen met STATUS_FEEDS_FILE. De Microsoft 365-feed gaat over consumentendiensten; de status van je eigen tenant zie je alleen in het beheercentrum.
+    summaryOk: 'Alle {total} diensten met een feed melden geen problemen'
+    summaryProblems: '{n} van {total} diensten melden een probleem'
+    summaryUnknown: '{n} konden niet worden gecontroleerd'
+    checkedAt: 'gecontroleerd {time}'
+    updated: 'bijgewerkt {time}'
+    components: 'Getroffen: {list}'
+    more: '+ {n} meer'
+    open: Statuspagina
+    linkOnly: Geen openbare feed — open de statuspagina om te kijken.
+    none: Geen diensten gevonden voor dit filter.
+    states:
+      operational: Operationeel
+      maintenance: Onderhoud
+      degraded: Verstoord
+      outage: Storing
+      unknown: Onbekend
+      link: Link
+    impact:
+      outage: Storing
+      degraded: Verstoord
+      maintenance: Onderhoud
+      info: Info
+  quick-links:
+    title: Snelle links
+    description: Je eigen lijst met beheerportalen, controlepanelen en storingspagina's, bijgehouden door de beheerder van deze NET-TOOLS-server.
+    filter: Links filteren
+    other: Overig
+    examples: Dit zijn voorbeeldlinks. De beheerder kan ze vervangen door een YAML-bestand (LINKS_FILE).
+    none: Geen links gevonden voor dit filter.
+  domain-scorecard:
+    title: Domeinscore
+    description: Eén score voor een domein, zoals internet.nl — website (IPv6, HTTPS, TLS, doorverwijzing, beveiligingsheaders, HSTS, HTTP/2 en HTTP/3), e-mail (SPF, DMARC, MTA-STS, STARTTLS, DANE) en DNS (naamservers, DNSSEC, SOA, CAA).
+    run: Domein beoordelen
+    note: Combineert ongeveer 14 controles uit de web-, TLS-, e-mail- en DNS-tools, drie tegelijk uitgevoerd vanaf de NET-TOOLS-server; dit duurt tot een minuut. DKIM en reverse DNS van de mailserver staan in het e-mailbezorgingsrapport.
+    progress: '{done} van {total} controles klaar'
+    result: 'Domeinscore voor {domain}'
+    sections:
+      web: Website
+      mail: E-mail
+      dns: DNS
+    checks:
+      ipv6: IPv6 voor web-, mail- en naamservers
+      https: HTTPS met een geldig certificaat
+      tlsVersion: Onderhandelt TLS 1.3
+      certExpiry: 'Certificaat nog minstens 30 dagen geldig ({days} d)'
+      httpsRedirect: http:// verwijst door naar https://
+      headers: Beveiligingsheaders cijfer A of beter
+      hsts: HSTS (Strict-Transport-Security)
+      http2: HTTP/2
+      http3: HTTP/3 (QUIC)
+  ipv6-test:
+    title: IPv6-verbindingstest
+    description: Werkt IPv6 op de verbinding van deze browser? Bereikbaarheid over IPv4 en IPv6, welke dual-stacksites gebruiken, trage terugval door kapot IPv6 — met een score van 10, zoals test-ipv6.com.
+    intro: Je browser haalt kleine antwoorden op bij openbare testendpoints (ipify, Cloudflare) over IPv4, IPv6 en dual stack. Er gaat niets via de NET-TOOLS-server.
+    run: Opnieuw uitvoeren
+    result: Resultaat
+    details: Tests
+    scoreLabel: 'IPv6-gereedheid {score} van 10'
+    ok: 'OK via {family}'
+    prefersV6: Dual-stacksites worden via IPv6 bereikt.
+    prefersV4: Dual-stacksites worden via IPv4 bereikt, hoewel IPv6 werkt (browser of besturingssysteem geeft de voorkeur aan IPv4).
+    slowFallback: Dual-stacksites laden meer dan een seconde trager dan sites met alleen IPv4. IPv6 is waarschijnlijk ingesteld maar kapot, en de browser wacht voordat hij terugvalt op IPv4.
+    note: 'Een IPv6-adres zonder naam kan hier niet worden getest (browsers staan dat niet toe onder het contentbeveiligingsbeleid van deze pagina), en grote pakketten over IPv6 (MTU-problemen) ook niet. Klik op een adres om het netwerk op te zoeken.'
+    verdicts:
+      ipv6-ok: IPv6 en IPv4 werken allebei. Deze verbinding is klaar voor IPv6.
+      ipv4-only: Alleen IPv4 werkt. Sites zijn bereikbaar, maar deze verbinding heeft geen IPv6; vraag het je provider of controleer de router.
+      ipv6-only: Alleen IPv6 werkt direct; IPv4-sites worden bereikt via NAT64 of een vergelijkbare vertaling.
+      broken: De dual-stacktest mislukte terwijl de single-stacktests werkten. Iets op het pad breekt dual-stackverbindingen (DNS, firewall of een proxy).
+      offline: Geen van de testendpoints was bereikbaar. De verbinding is misschien weg, of een filter of extensie blokkeert ze.
+    probes:
+      v4: IPv4 (naam met alleen een A-record)
+      v6: IPv6 (naam met alleen een AAAA-record)
+      dual: Dual stack (A en AAAA)
+      v4literal: IPv4 zonder DNS (1.1.1.1)
+    errors:
+      timeout: Time-out
+      network: Mislukt
+      parse: Onverwacht antwoord
+    columns:
+      test: Test
+      result: Resultaat
+      ip: Jouw adres
+      ms: Tijd
   provider-status:
     title: Providerstatus
     description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.

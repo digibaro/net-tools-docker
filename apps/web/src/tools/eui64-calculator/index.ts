@@ -11,4 +11,5 @@ export const tool = defineTool({
   icon: Plug,
   createdAt: new Date('2026-10-13'),
   runMode: 'browser',
+  accepts: { mac: 'mac' },
 })

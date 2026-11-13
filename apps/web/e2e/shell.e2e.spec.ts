@@ -32,3 +32,33 @@ test('menu toggle hides and shows the sidebar on mobile', async ({ page }) => {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
   expect(overflow).toBe(false)
 })
+
+test('palette recognises a domain and offers tools and external sites', async ({ page }) => {
+  await page.goto('/')
+  await page.keyboard.press('Control+k')
+  await expect(page.getByRole('combobox')).toBeFocused()
+  await page.keyboard.type('example.com')
+  await expect(page.getByTestId('palette-target')).toContainText(': example.com')
+  await expect(page.getByTestId('palette-external').first()).toBeVisible()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/\?name=example\.com$/)
+})
+
+test('palette hides external sites when switched off in settings', async ({ page }) => {
+  await page.goto('/settings')
+  await page.getByTestId('external-links').click()
+  await page.keyboard.press('Control+k')
+  await expect(page.getByRole('combobox')).toBeFocused()
+  await page.keyboard.type('AS13335')
+  await expect(page.getByTestId('palette-target')).toContainText('AS13335')
+  await expect(page.getByTestId('palette-external')).toHaveCount(0)
+})
+
+test('tool page offers to look the target up elsewhere', async ({ page }) => {
+  await page.goto('/ip-reputation?ip=192.0.2.1')
+  await page.getByTestId('pivot').click()
+  const menu = page.locator('[data-dropdown-option]')
+  await expect(menu.getByText('Shodan')).toBeVisible()
+  await menu.getByText('IP geolocation').click()
+  await expect(page).toHaveURL(/\/ip-geolocation\?ip=192\.0\.2\.1$/)
+})

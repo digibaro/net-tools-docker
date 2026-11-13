@@ -19,6 +19,10 @@ search:
   open: Search tools
   placeholder: Search tools…
   noResults: No matching tools
+  placeholderTarget: Search tools, or type an IP, domain, URL, ASN or prefix…
+  runFor: 'Run for {value}'
+  openIn: 'Open in {site}'
+  external: External lookup
 theme:
   accent: Accent colour
   accents:
@@ -54,6 +58,7 @@ categories:
   lan: LAN
   calculators: Calculators & Reference
   client: Client Diagnostics
+  dashboard: Status & Links
 runMode:
   browser:
     label: Browser
@@ -123,11 +128,26 @@ common:
   none: None
   result: Result
   invalid: Invalid value
+targets:
+  ip: IP address
+  domain: Domain
+  url: URL
+  asn: AS number
+  prefix: Prefix
+  email: E-mail address
+  mac: MAC address
+pivot:
+  button: Look up elsewhere
+  tools: Other NET-TOOLS
+  external: External sites
 settings:
   appearance: Appearance
   language: Language
   favoritesCount: 'You have {count} favorite tools.'
   clearFavorites: Remove all favorites
+  privacy: Privacy
+  externalLinks: Show links to external lookup sites
+  externalLinksHelp: Offers Shodan, VirusTotal, crt.sh, bgp.tools and similar sites for the IP, domain or ASN you are looking at. Nothing is sent until you click a link; the site then receives that target.
 about:
   intro: NET-TOOLS bundles network tools and troubleshooting utilities in one self-hosted app.
   build: Build
@@ -3799,6 +3819,137 @@ tools:
       bimi: BIMI record (brand logo)
       dane: DANE / TLSA for the MX hosts
       fcrdns: 'Reverse DNS of {host} confirms forward (FCrDNS)'
+  m365-domain-check:
+    title: Microsoft 365 domain check
+    description: The DNS records Microsoft 365 needs (MX, SPF, Autodiscover, DKIM, DMARC, Intune, Teams) and the tenant behind a domain — ID, region, managed or federated sign-in.
+    run: Check the domain
+    note: 'DNS is resolved from the NET-TOOLS server; the tenant comes from Microsoft''s public sign-in discovery endpoints (no key, no sign-in). Teams/Skype records are only needed for older or hybrid setups.'
+    result: 'Microsoft 365 records for {domain}'
+    tenant: Tenant
+    records: Records
+    notM365: '{domain} has no Microsoft 365 tenant and its mail does not go to Exchange Online. The records below are shown for reference only.'
+    tenantError: 'Tenant lookup failed: {error}'
+    fields:
+      tenantId: Tenant ID
+      brand: Organisation name
+      region: Region
+      namespace: Sign-in
+      federationHost: Federation server
+    namespace:
+      Managed: Managed (Microsoft Entra ID accounts)
+      Federated: Federated (ADFS or another identity provider)
+      Unknown: Unknown
+    columns:
+      name: Name
+      type: Type
+      expected: Microsoft 365 expects
+      found: Found
+    checks:
+      tenant: Microsoft 365 tenant found
+      mx: MX points to Exchange Online
+      spf: SPF includes spf.protection.outlook.com
+      verification: Domain verification record (MS=)
+      autodiscover: Autodiscover CNAME for Outlook
+      dkim1: DKIM selector1 CNAME
+      dkim2: DKIM selector2 CNAME
+      dmarc: DMARC record
+      enterpriseRegistration: Device registration (enterpriseregistration)
+      enterpriseEnrollment: Intune enrolment (enterpriseenrollment)
+      lyncdiscover: Teams / Skype for Business (lyncdiscover)
+      sip: Teams / Skype for Business (sip)
+      sipTls: SIP SRV record (_sip._tls)
+      sipFederation: SIP federation SRV record (_sipfederationtls._tcp)
+  cloud-status:
+    title: Cloud service status
+    description: Current incidents and maintenance at Microsoft 365, Azure, Google Workspace, AWS, Cloudflare, GitHub, OpenAI, Slack and more — read from their public status feeds, problems first.
+    refresh: Refresh
+    auto: Refresh every 2 minutes
+    problemsOnly: Only problems
+    filter: Filter services or incidents
+    note: 'Fetched by the NET-TOOLS server from each provider''s public status feed and cached for 2 minutes. The list can be changed with STATUS_FEEDS_FILE. The Microsoft 365 feed covers consumer services; the health of your own tenant is only visible in the admin center.'
+    summaryOk: 'All {total} services with a feed report no problems'
+    summaryProblems: '{n} of {total} services report a problem'
+    summaryUnknown: '{n} could not be checked'
+    checkedAt: 'checked {time}'
+    updated: 'updated {time}'
+    components: 'Affected: {list}'
+    more: '+ {n} more'
+    open: Status page
+    linkOnly: No public feed — open the status page to check.
+    none: No services match the filter.
+    states:
+      operational: Operational
+      maintenance: Maintenance
+      degraded: Degraded
+      outage: Outage
+      unknown: Unknown
+      link: Link
+    impact:
+      outage: Outage
+      degraded: Degraded
+      maintenance: Maintenance
+      info: Info
+  quick-links:
+    title: Quick links
+    description: Your own list of admin portals, control panels and outage pages, maintained by the administrator of this NET-TOOLS server.
+    filter: Filter links
+    other: Other
+    examples: These are example links. The administrator can replace them with a YAML file (LINKS_FILE).
+    none: No links match the filter.
+  domain-scorecard:
+    title: Domain scorecard
+    description: One score for a domain, like internet.nl — website (IPv6, HTTPS, TLS, redirect, security headers, HSTS, HTTP/2 and HTTP/3), email (SPF, DMARC, MTA-STS, STARTTLS, DANE) and DNS (name servers, DNSSEC, SOA, CAA).
+    run: Score the domain
+    note: Combines about 14 checks from the web, TLS, email and DNS tools, run from the NET-TOOLS server three at a time; this takes up to a minute. DKIM and reverse DNS of the mail server are in the email deliverability report.
+    progress: '{done} of {total} checks done'
+    result: 'Scorecard for {domain}'
+    sections:
+      web: Website
+      mail: Email
+      dns: DNS
+    checks:
+      ipv6: IPv6 for web, mail and name servers
+      https: HTTPS with a valid certificate
+      tlsVersion: Negotiates TLS 1.3
+      certExpiry: 'Certificate valid for at least 30 days ({days} d)'
+      httpsRedirect: http:// redirects to https://
+      headers: Security headers grade A or better
+      hsts: HSTS (Strict-Transport-Security)
+      http2: HTTP/2
+      http3: HTTP/3 (QUIC)
+  ipv6-test:
+    title: IPv6 connection test
+    description: Is IPv6 working on the connection of this browser? IPv4 and IPv6 reachability, which one dual-stack sites use, slow fallback from broken IPv6 — scored out of 10, like test-ipv6.com.
+    intro: Your browser fetches small answers from public test endpoints (ipify, Cloudflare) over IPv4, IPv6 and dual stack. Nothing goes through the NET-TOOLS server.
+    run: Run again
+    result: Result
+    details: Tests
+    scoreLabel: 'IPv6 readiness {score} out of 10'
+    ok: 'OK over {family}'
+    prefersV6: Dual-stack sites are reached over IPv6.
+    prefersV4: Dual-stack sites are reached over IPv4, although IPv6 works (the browser or OS prefers IPv4).
+    slowFallback: Dual-stack sites load more than a second slower than IPv4-only ones. IPv6 is probably configured but broken, and the browser waits before falling back to IPv4.
+    note: 'An IPv6 address literal cannot be tested here (browsers do not allow it under this page''s content security policy), and neither can large packets over IPv6 (MTU problems). Click an address to look up its network.'
+    verdicts:
+      ipv6-ok: IPv6 and IPv4 both work. This connection is ready for IPv6.
+      ipv4-only: Only IPv4 works. Sites are reachable, but this connection has no IPv6; ask your provider or check the router.
+      ipv6-only: Only IPv6 works directly; IPv4 sites are reached through NAT64 or a similar translation.
+      broken: The dual-stack test failed while single-stack tests worked. Something on the path breaks dual-stack connections (DNS, firewall or a proxy).
+      offline: None of the test endpoints could be reached. The connection may be down, or a filter or extension blocks them.
+    probes:
+      v4: IPv4 (name with only an A record)
+      v6: IPv6 (name with only an AAAA record)
+      dual: Dual stack (A and AAAA)
+      v4literal: IPv4 without DNS (1.1.1.1)
+    errors:
+      timeout: Timed out
+      network: Failed
+      parse: Unexpected answer
+    columns:
+      test: Test
+      result: Result
+      ip: Your address
+      ms: Time
   provider-status:
     title: Provider status
     description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.

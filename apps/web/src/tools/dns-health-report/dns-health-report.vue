@@ -11,6 +11,7 @@ import { useQueryParam } from '@/composables/useQueryParam'
 import { useValidation } from '@/composables/useValidation'
 import CCard from '@/ui/c-card.vue'
 import CInputText from '@/ui/c-input-text.vue'
+import { limiter } from '@/utils/limit'
 import { isValidQueryName } from '../dns-lookup/dns-lookup.service'
 import { dnsHealth } from './dns-health-report.service'
 
@@ -20,8 +21,10 @@ const validation = useValidation({ source: zone, rules: [{ validator: (s: string
 const inputs = shallowRef<Inputs>()
 const loading = ref(false)
 const ran = ref('')
+// The api runs at most 3 jobs per client; more at once would come back BUSY and look "skipped".
+const limit = limiter(3)
 function get<T>(path: string, q: Record<string, string>): Promise<T | undefined> {
-  return apiGet<T>(`${path}${buildQuery(q)}`).catch(() => undefined)
+  return limit(() => apiGet<T>(`${path}${buildQuery(q)}`)).catch(() => undefined)
 }
 async function run() {
   const z = zone.value.trim().replace(/\.$/, '')

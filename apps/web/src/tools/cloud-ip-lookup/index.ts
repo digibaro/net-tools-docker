@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-14'),
   runMode: 'server',
   capability: 'bgp.cloudranges',
+  accepts: { ip: 'ip' },
 })

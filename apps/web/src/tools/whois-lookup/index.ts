@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-13'),
   runMode: 'server',
   capability: 'reg.whois',
+  accepts: { domain: 'query', ip: 'query', asn: 'query' },
 })

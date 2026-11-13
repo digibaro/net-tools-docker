@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { ColorMode } from '@/stores/style.store'
-import { DeviceDesktop, Home, InfoCircle, Moon, Search, Settings, Sun } from '@vicons/tabler'
+import { DeviceDesktop, ExternalLink, Home, InfoCircle, Moon, Search, Settings, Sun } from '@vicons/tabler'
 import { NIcon, NInput, NModal, useThemeVars } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -9,6 +9,7 @@ import { useRouter } from 'vue-router'
 import { useStyleStore } from '@/stores/style.store'
 import { useToolStore } from '@/stores/tool.store'
 import { createToolSearch } from '@/tools/search'
+import { detectTarget, externalLinks, quickActions } from '@/tools/targets'
 
 interface Command {
   id: string
@@ -16,6 +17,8 @@ interface Command {
   hint?: string
   icon: Component
   run: () => void
+  /** Opens a third-party site (shown with an external-link marker). */
+  external?: boolean
 }
 
 const show = defineModel<boolean>('show', { default: false })
@@ -47,7 +50,35 @@ const staticCommands = computed<Command[]>(() => [
   })),
 ])
 
+// An IP, domain, URL, ASN, prefix, e-mail or MAC address: offer the tools that take it first.
+const target = computed(() => detectTarget(query.value))
+const targetCommands = computed<Command[]>(() => {
+  const tgt = target.value
+  if (!tgt)
+    return []
+  const runs = quickActions(tgt, tools.tools).map(a => ({
+    id: `run:${a.to}`,
+    label: a.tool.name,
+    hint: t('search.runFor', { value: a.target.value }),
+    icon: a.tool.icon,
+    run: () => router.push(a.to),
+  }))
+  const ext = style.externalLinks
+    ? externalLinks(tgt).map(l => ({
+        id: `ext:${l.id}`,
+        label: t('search.openIn', { site: l.name }),
+        hint: t('search.external'),
+        icon: ExternalLink,
+        external: true,
+        run: () => window.open(l.url, '_blank', 'noopener,noreferrer'),
+      }))
+    : []
+  return [...runs, ...ext]
+})
+
 const results = computed<Command[]>(() => {
+  if (targetCommands.value.length)
+    return targetCommands.value
   const q = query.value.trim().toLowerCase()
   const toolCommands = (q ? search.value(q, 12) : tools.favorites.length ? tools.favorites : tools.tools.slice(0, 8))
     .map(tool => ({ id: tool.path, label: tool.name, hint: tool.description, icon: tool.icon, run: () => router.push(tool.path) }))
@@ -97,15 +128,18 @@ function onKeydown(e: KeyboardEvent) {
     <NInput
       ref="input"
       v-model:value="query"
-      :placeholder="t('search.placeholder')"
+      :placeholder="t('search.placeholderTarget')"
       clearable
-      :input-props="{ 'aria-label': t('search.placeholder'), 'aria-controls': 'palette-results', 'role': 'combobox', 'aria-expanded': true }"
+      :input-props="{ 'aria-label': t('search.placeholderTarget'), 'aria-controls': 'palette-results', 'role': 'combobox', 'aria-expanded': true }"
       @keydown="onKeydown"
     >
       <template #prefix>
         <NIcon aria-hidden="true" :component="Search" />
       </template>
     </NInput>
+    <p v-if="target" class="mb-0 mt-2 text-xs nt-muted" data-testid="palette-target">
+      {{ t(`targets.${target.kind}`) }}: <span class="font-mono">{{ target.value }}</span>
+    </p>
     <ul id="palette-results" role="listbox" class="m-0 mt-3 max-h-96 list-none overflow-auto p-0">
       <li
         v-for="(cmd, i) in results"
@@ -119,7 +153,7 @@ function onKeydown(e: KeyboardEvent) {
         @click="execute(cmd)"
       >
         <NIcon :component="cmd.icon" :size="20" aria-hidden="true" />
-        <div class="min-w-0">
+        <div class="min-w-0" :data-testid="cmd.external ? 'palette-external' : undefined">
           <div class="truncate">
             {{ cmd.label }}
           </div>

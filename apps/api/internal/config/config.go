@@ -56,18 +56,22 @@ type Features struct {
 	// ServerInfo exposes the server's interfaces/routes (CON-13); off in the public profile.
 	ServerInfo bool
 	// Speedtest serves bandwidth-test traffic (CON-09); off in the public profile.
-	Speedtest       bool
-	LAN             bool
-	MetricsEnabled  bool
-	LogHashIPs      bool
-	AuditLog        bool
-	AllowPrivate    bool
-	TrustedProxies  []netip.Prefix
-	DenyCIDRs       []netip.Prefix
-	AllowCIDRs      []netip.Prefix
-	GeoIPCityDB     string
-	GeoIPASNDB      string
-	RIPEstatSrcApp  string
+	Speedtest      bool
+	LAN            bool
+	MetricsEnabled bool
+	LogHashIPs     bool
+	AuditLog       bool
+	AllowPrivate   bool
+	TrustedProxies []netip.Prefix
+	DenyCIDRs      []netip.Prefix
+	AllowCIDRs     []netip.Prefix
+	GeoIPCityDB    string
+	GeoIPASNDB     string
+	RIPEstatSrcApp string
+	// StatusFeedsFile and LinksFile are optional YAML lists for the cloud status (DASH-01) and
+	// quick links (DASH-02) tools; empty means the built-in defaults.
+	StatusFeedsFile string
+	LinksFile       string
 	ProviderSecrets map[string]string
 }
 
@@ -173,24 +177,26 @@ func LoadFrom(lookup LookupFunc, readFile ReadFileFunc) (Config, error) {
 			MonitorMaxMinutes:  p.posInt("MONITOR_MAX_MINUTES", 30),
 		},
 		Features: Features{
-			Portscan:       p.boolean("PORTSCAN_ENABLED", relaxed),
-			Iperf:          p.boolean("IPERF_ENABLED", true),
-			SNMP:           p.boolean("SNMP_ENABLED", false),
-			AXFR:           p.boolean("AXFR_ENABLED", true),
-			OpenRelayTest:  p.boolean("OPEN_RELAY_TEST_ENABLED", false),
-			ServerInfo:     p.boolean("SERVER_INFO_ENABLED", relaxed),
-			Speedtest:      p.boolean("SPEEDTEST_ENABLED", relaxed),
-			LAN:            p.boolean("NETTOOLS_LAN", false),
-			MetricsEnabled: p.boolean("METRICS_ENABLED", false),
-			LogHashIPs:     p.boolean("LOG_HASH_IPS", false),
-			AuditLog:       p.boolean("AUDIT_LOG", false),
-			AllowPrivate:   p.boolean("ALLOW_PRIVATE_TARGETS", relaxed),
-			TrustedProxies: p.prefixes("TRUSTED_PROXIES", "172.16.0.0/12"),
-			DenyCIDRs:      p.prefixes("DENY_CIDRS", ""),
-			AllowCIDRs:     p.prefixes("ALLOW_CIDRS", ""),
-			GeoIPCityDB:    p.str("GEOIP_CITY_DB", ""),
-			GeoIPASNDB:     p.str("GEOIP_ASN_DB", ""),
-			RIPEstatSrcApp: p.str("RIPESTAT_SOURCEAPP", "nettools"),
+			Portscan:        p.boolean("PORTSCAN_ENABLED", relaxed),
+			Iperf:           p.boolean("IPERF_ENABLED", true),
+			SNMP:            p.boolean("SNMP_ENABLED", false),
+			AXFR:            p.boolean("AXFR_ENABLED", true),
+			OpenRelayTest:   p.boolean("OPEN_RELAY_TEST_ENABLED", false),
+			ServerInfo:      p.boolean("SERVER_INFO_ENABLED", relaxed),
+			Speedtest:       p.boolean("SPEEDTEST_ENABLED", relaxed),
+			LAN:             p.boolean("NETTOOLS_LAN", false),
+			MetricsEnabled:  p.boolean("METRICS_ENABLED", false),
+			LogHashIPs:      p.boolean("LOG_HASH_IPS", false),
+			AuditLog:        p.boolean("AUDIT_LOG", false),
+			AllowPrivate:    p.boolean("ALLOW_PRIVATE_TARGETS", relaxed),
+			TrustedProxies:  p.prefixes("TRUSTED_PROXIES", "172.16.0.0/12"),
+			DenyCIDRs:       p.prefixes("DENY_CIDRS", ""),
+			AllowCIDRs:      p.prefixes("ALLOW_CIDRS", ""),
+			GeoIPCityDB:     p.str("GEOIP_CITY_DB", ""),
+			GeoIPASNDB:      p.str("GEOIP_ASN_DB", ""),
+			RIPEstatSrcApp:  p.str("RIPESTAT_SOURCEAPP", "nettools"),
+			StatusFeedsFile: p.str("STATUS_FEEDS_FILE", ""),
+			LinksFile:       p.str("LINKS_FILE", ""),
 		},
 	}
 

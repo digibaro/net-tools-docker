@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-14'),
   runMode: 'public-api',
   capability: 'bgp.lg',
+  accepts: { prefix: 'prefix', ip: 'prefix' },
 })
