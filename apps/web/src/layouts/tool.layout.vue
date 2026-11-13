@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { lowBudget, rateBudget } from '@/api/ratelimit'
 import FavoriteButton from '@/components/FavoriteButton.vue'
+import PivotMenu from '@/components/PivotMenu.vue'
 import RunModeBadge from '@/components/RunModeBadge.vue'
 import ToolDisabled from '@/components/ToolDisabled.vue'
 import { addHistory, clearHistory, getHistory, historyVersion, label, togglePin } from '@/composables/history'
@@ -68,6 +69,7 @@ const heavyLeft = computed(() => (props.tool.runMode === 'browser' ? undefined :
           </template>
           {{ t('compare.open') }}
         </NTooltip>
+        <PivotMenu :tool="tool" />
       </div>
       <p class="mb-0 mt-2 nt-muted">
         {{ tool.description }}

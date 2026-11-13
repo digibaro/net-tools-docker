@@ -56,7 +56,9 @@ export const useStyleStore = defineStore('style', () => {
   })
 
   const isMenuCollapsed = useStorage('nettools:menu-collapsed', false)
+  /** Offer links to third-party lookup sites (search palette, tool pages). */
+  const externalLinks = useStorage('nettools:external-links', true)
   const isSmallScreen = useMediaQuery('(max-width: 700px)')
 
-  return { colorMode, isDarkTheme, cycle, accent, isMenuCollapsed, isSmallScreen }
+  return { colorMode, isDarkTheme, cycle, accent, isMenuCollapsed, isSmallScreen, externalLinks }
 })

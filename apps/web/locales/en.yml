@@ -19,6 +19,10 @@ search:
   open: Search tools
   placeholder: Search tools…
   noResults: No matching tools
+  placeholderTarget: Search tools, or type an IP, domain, URL, ASN or prefix…
+  runFor: 'Run for {value}'
+  openIn: 'Open in {site}'
+  external: External lookup
 theme:
   accent: Accent colour
   accents:
@@ -124,11 +128,26 @@ common:
   none: None
   result: Result
   invalid: Invalid value
+targets:
+  ip: IP address
+  domain: Domain
+  url: URL
+  asn: AS number
+  prefix: Prefix
+  email: E-mail address
+  mac: MAC address
+pivot:
+  button: Look up elsewhere
+  tools: Other NET-TOOLS
+  external: External sites
 settings:
   appearance: Appearance
   language: Language
   favoritesCount: 'You have {count} favorite tools.'
   clearFavorites: Remove all favorites
+  privacy: Privacy
+  externalLinks: Show links to external lookup sites
+  externalLinksHelp: Offers Shodan, VirusTotal, crt.sh, bgp.tools and similar sites for the IP, domain or ASN you are looking at. Nothing is sent until you click a link; the site then receives that target.
 about:
   intro: NET-TOOLS bundles network tools and troubleshooting utilities in one self-hosted app.
   build: Build

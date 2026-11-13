@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-11-13'),
   runMode: 'server',
   capability: 'email.m365',
+  accepts: { domain: 'domain' },
 })

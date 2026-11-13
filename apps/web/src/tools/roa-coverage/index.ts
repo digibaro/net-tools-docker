@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-16'),
   runMode: 'server',
   capability: 'bgp.roacoverage',
+  accepts: { asn: 'asn' },
 })

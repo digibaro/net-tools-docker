@@ -19,6 +19,10 @@ search:
   open: Tools zoeken
   placeholder: Tools zoeken…
   noResults: Geen tools gevonden
+  placeholderTarget: Zoek tools, of typ een IP, domein, URL, ASN of prefix…
+  runFor: 'Uitvoeren voor {value}'
+  openIn: 'Openen in {site}'
+  external: Extern opzoeken
 theme:
   accent: Accentkleur
   accents:
@@ -124,11 +128,26 @@ common:
   none: Geen
   result: Resultaat
   invalid: Ongeldige waarde
+targets:
+  ip: IP-adres
+  domain: Domein
+  url: URL
+  asn: AS-nummer
+  prefix: Prefix
+  email: E-mailadres
+  mac: MAC-adres
+pivot:
+  button: Elders opzoeken
+  tools: Andere NET-TOOLS
+  external: Externe sites
 settings:
   appearance: Weergave
   language: Taal
   favoritesCount: 'Je hebt {count} favoriete tools.'
   clearFavorites: Alle favorieten verwijderen
+  privacy: Privacy
+  externalLinks: Links naar externe opzoeksites tonen
+  externalLinksHelp: Biedt Shodan, VirusTotal, crt.sh, bgp.tools en vergelijkbare sites aan voor het IP-adres, domein of ASN dat je bekijkt. Er wordt niets verstuurd tot je op een link klikt; die site krijgt dan dat doel.
 about:
   intro: NET-TOOLS bundelt netwerktools en hulpmiddelen voor troubleshooting in één zelfgehoste app.
   build: Build
@@ -3847,7 +3866,7 @@ tools:
     auto: Elke 2 minuten vernieuwen
     problemsOnly: Alleen problemen
     filter: Diensten of storingen filteren
-    note: 'Door de NET-TOOLS-server opgehaald uit de openbare statusfeed van elke aanbieder en 2 minuten gecachet. De lijst is aan te passen met STATUS_FEEDS_FILE. De Microsoft 365-feed gaat over consumentendiensten; de status van je eigen tenant zie je alleen in het beheercentrum.'
+    note: Door de NET-TOOLS-server opgehaald uit de openbare statusfeed van elke aanbieder en 2 minuten gecachet. De lijst is aan te passen met STATUS_FEEDS_FILE. De Microsoft 365-feed gaat over consumentendiensten; de status van je eigen tenant zie je alleen in het beheercentrum.
     summaryOk: 'Alle {total} diensten met een feed melden geen problemen'
     summaryProblems: '{n} van {total} diensten melden een probleem'
     summaryUnknown: '{n} konden niet worden gecontroleerd'

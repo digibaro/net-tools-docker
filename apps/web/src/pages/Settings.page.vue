@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ColorMode } from '@/stores/style.store'
 import type { Accent } from '@/themes'
-import { NButton, NFormItem, NRadio, NRadioButton, NRadioGroup, NSelect } from 'naive-ui'
+import { NButton, NFormItem, NRadio, NRadioButton, NRadioGroup, NSelect, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AccentSwatch from '@/components/AccentSwatch.vue'
@@ -40,6 +40,15 @@ const localeOptions = computed(() => availableLocales.map(l => ({ label: t(`loca
     </CCard>
     <CCard :title="t('settings.language')">
       <NSelect :value="locale" :options="localeOptions" :input-props="{ 'aria-label': t('settings.language') }" @update:value="setLocale" />
+    </CCard>
+    <CCard :title="t('settings.privacy')">
+      <label class="flex items-center gap-3">
+        <NSwitch v-model:value="style.externalLinks" data-testid="external-links" :aria-label="t('settings.externalLinks')" />
+        {{ t('settings.externalLinks') }}
+      </label>
+      <p class="mb-0 mt-2 text-sm nt-muted">
+        {{ t('settings.externalLinksHelp') }}
+      </p>
     </CCard>
     <CCard :title="t('home.favorites')">
       <p class="mt-0 nt-muted">

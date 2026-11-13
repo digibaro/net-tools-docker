@@ -11,4 +11,5 @@ export const tool = defineTool({
   icon: Microscope,
   createdAt: new Date('2026-10-16'),
   runMode: 'browser',
+  accepts: { ip: 'ip' },
 })

@@ -11,4 +11,5 @@ export const tool = defineTool({
   icon: Sitemap,
   createdAt: new Date('2026-10-13'),
   runMode: 'browser',
+  accepts: { ip: 'ip', prefix: 'ip' },
 })

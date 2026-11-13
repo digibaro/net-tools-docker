@@ -12,4 +12,5 @@ export const tool = defineTool({
   createdAt: new Date('2026-10-27'),
   runMode: 'server',
   capability: 'dns.consistency',
+  accepts: { domain: 'zone' },
 })
