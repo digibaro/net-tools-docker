@@ -137,6 +137,13 @@ Client IP for rate limiting comes from `X-Forwarded-For` **only if** the immedia
 - `/api/v1/providers/status` reports per provider only whether a key is set, counters and a
   client-safe problem text (`HTTP 429`, "did not answer in time"); a test asserts it never contains a
   key or a provider URL.
+- Status feeds (DASH-01) and quick links (DASH-02) come from admin files (`STATUS_FEEDS_FILE`,
+  `LINKS_FILE`, or `status-feeds.yml` / `links.yml` in `DATA_DIR`). Feeds must be https and are
+  fetched through the provider client (target policy, so a feed URL cannot reach private ranges
+  unless private targets are allowed); at most 60 feeds, 2 min cache, light rate limit. Links are
+  only rendered, never fetched, and must be http(s). A broken file falls back to the built-in list
+  and the visitor sees a generic warning, never the path or parse error. Incident links from feeds
+  are rendered only when they are https.
 - Outbound provider calls: timeout 10 s (30 s for crt.sh, which is often slow), response size cap 5 MiB, user-agent
   `NetTools/<version> (+<PUBLIC_URL>)`.
 

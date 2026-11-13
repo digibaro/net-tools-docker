@@ -1,0 +1,17 @@
+# Quick links (Status & Links → Quick links). Copy to data/links.yml (or point LINKS_FILE at
+# another file) and restart the api container. Only http:// and https:// URLs are accepted;
+# links are shown grouped, in the order listed here.
+links:
+  - name: Microsoft 365 admin center
+    url: https://admin.microsoft.com/
+    group: Microsoft
+  - name: Microsoft Entra admin center
+    url: https://entra.microsoft.com/
+    group: Microsoft
+  - name: Cloudflare dashboard
+    url: https://dash.cloudflare.com/
+    group: Hosting
+  - name: Router
+    url: http://192.168.1.1/
+    description: Home router web interface
+    group: LAN

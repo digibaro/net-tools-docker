@@ -21,6 +21,7 @@ import { tool as certificateDecoder } from './certificate-decoder'
 import { tool as cidrAggregator } from './cidr-aggregator'
 import { tool as cidrRangeConverter } from './cidr-range-converter'
 import { tool as cloudIpLookup } from './cloud-ip-lookup'
+import { tool as cloudStatus } from './cloud-status'
 import { tool as commonIxps } from './common-ixps'
 import { tool as compressionCheck } from './compression-check'
 import { tool as configDiff } from './config-diff'
@@ -119,6 +120,7 @@ import { tool as protocolReference } from './protocol-reference'
 import { tool as providerStatus } from './provider-status'
 import { tool as ptrCoverage } from './ptr-coverage'
 import { tool as punycodeConverter } from './punycode-converter'
+import { tool as quickLinks } from './quick-links'
 import { tool as randomIpGenerator } from './random-ip-generator'
 import { tool as rdapLookup } from './rdap-lookup'
 import { tool as redirectTracer } from './redirect-tracer'
@@ -183,6 +185,7 @@ const categories: { id: string, components: Tool[] }[] = [
   { id: 'lan', components: [wakeOnLan, arpScan, mdnsBrowser, ssdpDiscovery, dhcpProbe, gatewayInfo, lldpNeighbors, ipv6Neighbors, dhcpv6Probe] },
   { id: 'calculators', components: [bandwidthCalculator, dataUnitConverter, bdpCalculator, mtuCalculator, portReference, protocolReference, dnsRecordTypes, subnetCheatSheet, wifiQrGenerator, opticalPower, wireguardConfig, routerSnippets, slaCalculator, voipBandwidthCalculator, packetDecoder, pcapViewer, poeBudgetCalculator, natCapacityCalculator, wirelessLinkCalculator, dscpConverter, configDiff, aclAnalyzer] },
   { id: 'client', components: [requestHeaders, browserLatency, connectionInfo, webrtcLeakTest, speedTest, dnsProxyCheck, providerStatus, reportBundle] },
+  { id: 'dashboard', components: [cloudStatus, quickLinks] },
 ]
 
 export const toolsByCategory: ToolCategory[] = categories

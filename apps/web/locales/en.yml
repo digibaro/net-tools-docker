@@ -54,6 +54,7 @@ categories:
   lan: LAN
   calculators: Calculators & Reference
   client: Client Diagnostics
+  dashboard: Status & Links
 runMode:
   browser:
     label: Browser
@@ -3839,6 +3840,42 @@ tools:
       sip: Teams / Skype for Business (sip)
       sipTls: SIP SRV record (_sip._tls)
       sipFederation: SIP federation SRV record (_sipfederationtls._tcp)
+  cloud-status:
+    title: Cloud service status
+    description: Current incidents and maintenance at Microsoft 365, Azure, Google Workspace, AWS, Cloudflare, GitHub, OpenAI, Slack and more — read from their public status feeds, problems first.
+    refresh: Refresh
+    auto: Refresh every 2 minutes
+    problemsOnly: Only problems
+    filter: Filter services or incidents
+    note: 'Fetched by the NET-TOOLS server from each provider''s public status feed and cached for 2 minutes. The list can be changed with STATUS_FEEDS_FILE. The Microsoft 365 feed covers consumer services; the health of your own tenant is only visible in the admin center.'
+    summaryOk: 'All {total} services with a feed report no problems'
+    summaryProblems: '{n} of {total} services report a problem'
+    summaryUnknown: '{n} could not be checked'
+    checkedAt: 'checked {time}'
+    updated: 'updated {time}'
+    components: 'Affected: {list}'
+    open: Status page
+    linkOnly: No public feed — open the status page to check.
+    none: No services match the filter.
+    states:
+      operational: Operational
+      maintenance: Maintenance
+      degraded: Degraded
+      outage: Outage
+      unknown: Unknown
+      link: Link
+    impact:
+      outage: Outage
+      degraded: Degraded
+      maintenance: Maintenance
+      info: Info
+  quick-links:
+    title: Quick links
+    description: Your own list of admin portals, control panels and outage pages, maintained by the administrator of this NET-TOOLS server.
+    filter: Filter links
+    other: Other
+    examples: These are example links. The administrator can replace them with a YAML file (LINKS_FILE).
+    none: No links match the filter.
   provider-status:
     title: Provider status
     description: Which public services this NET-TOOLS server uses, whether their API keys are set (the keys themselves are never shown), and how calls went since the last restart.

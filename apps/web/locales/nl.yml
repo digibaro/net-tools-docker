@@ -54,6 +54,7 @@ categories:
   lan: LAN
   calculators: Rekenhulpen & naslag
   client: Clientdiagnose
+  dashboard: Status & links
 runMode:
   browser:
     label: Browser
@@ -3839,6 +3840,42 @@ tools:
       sip: Teams / Skype for Business (sip)
       sipTls: SIP SRV-record (_sip._tls)
       sipFederation: SIP-federatie SRV-record (_sipfederationtls._tcp)
+  cloud-status:
+    title: Status clouddiensten
+    description: Actuele storingen en onderhoud bij Microsoft 365, Azure, Google Workspace, AWS, Cloudflare, GitHub, OpenAI, Slack en meer — uit hun openbare statusfeeds, problemen bovenaan.
+    refresh: Vernieuwen
+    auto: Elke 2 minuten vernieuwen
+    problemsOnly: Alleen problemen
+    filter: Diensten of storingen filteren
+    note: 'Door de NET-TOOLS-server opgehaald uit de openbare statusfeed van elke aanbieder en 2 minuten gecachet. De lijst is aan te passen met STATUS_FEEDS_FILE. De Microsoft 365-feed gaat over consumentendiensten; de status van je eigen tenant zie je alleen in het beheercentrum.'
+    summaryOk: 'Alle {total} diensten met een feed melden geen problemen'
+    summaryProblems: '{n} van {total} diensten melden een probleem'
+    summaryUnknown: '{n} konden niet worden gecontroleerd'
+    checkedAt: 'gecontroleerd {time}'
+    updated: 'bijgewerkt {time}'
+    components: 'Getroffen: {list}'
+    open: Statuspagina
+    linkOnly: Geen openbare feed — open de statuspagina om te kijken.
+    none: Geen diensten gevonden voor dit filter.
+    states:
+      operational: Operationeel
+      maintenance: Onderhoud
+      degraded: Verstoord
+      outage: Storing
+      unknown: Onbekend
+      link: Link
+    impact:
+      outage: Storing
+      degraded: Verstoord
+      maintenance: Onderhoud
+      info: Info
+  quick-links:
+    title: Snelle links
+    description: Je eigen lijst met beheerportalen, controlepanelen en storingspagina's, bijgehouden door de beheerder van deze NET-TOOLS-server.
+    filter: Links filteren
+    other: Overig
+    examples: Dit zijn voorbeeldlinks. De beheerder kan ze vervangen door een YAML-bestand (LINKS_FILE).
+    none: Geen links gevonden voor dit filter.
   provider-status:
     title: Providerstatus
     description: Welke publieke diensten deze NET-TOOLS-server gebruikt, of hun API-sleutels zijn ingesteld (de sleutels zelf worden nooit getoond), en hoe aanroepen gingen sinds de laatste herstart.

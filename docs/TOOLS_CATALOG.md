@@ -242,6 +242,13 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | CLI-06 | Provider status | Per public provider: key configured (never the key), requests, cache hits, errors, last problem since start | S | `/api/v1/providers/status` | — | 7 | ✅ |
 | CLI-07 | Report bundle | Collect result tables from any tool ("Add to report"), reorder, export Markdown / JSON / print-PDF; kept in the browser | B | `localStorage` | — | 7 | ✅ |
 
+## 12. Status & Links
+
+| ID | Tool | What it does | Run | Local implementation | Public API option | Phase | Status |
+|---|---|---|---|---|---|---|---|
+| DASH-01 | Cloud service status | Current incidents / maintenance of Microsoft 365, Azure, Google Workspace & Cloud, AWS, Cloudflare, GitHub, OpenAI, Claude, Slack, Zoom, … — problems first, auto-refresh; list replaceable via `STATUS_FEEDS_FILE` / `data/status-feeds.yml` | P | parsers for Statuspage, Google, AWS Health (UTF-16), RSS/Atom, M365 consumer, Slack | public status feeds (keyless), cached 2 min | 8 | ✅ |
+| DASH-02 | Quick links | Admin-maintained links (portals, control panels, outage pages), grouped and filterable; `LINKS_FILE` / `data/links.yml`, http(s) only | S | YAML file read at start-up | — | 8 | ✅ |
+
 ---
 
 ### Totals
@@ -277,6 +284,7 @@ The backlog of every tool. Claude Code updates the **Status** column (`⬜` todo
 | AbuseIPDB | REP-02 | Yes | |
 | Mozilla HTTP Observatory | WEB-04 | No | |
 | hstspreload.org | WEB-10 | No | |
+| Status feeds — Statuspage `summary.json`, Google `incidents.json`, AWS Health `currentevents`, Azure RSS, `status.cloud.microsoft`, Slack | DASH-01 | No | One provider entry for all feeds; cached 2 min; https only |
 | Microsoft Entra ID — `login.microsoftonline.com` (OpenID discovery, `getuserrealm.srf`) | EM-13 | No | Tenant ID, region, managed/federated; dummy probe login, cached 1 h |
 | SSL Labs API v4 | TLS-03 | Registration (email) | Slow; async polling |
 | check-host.net | CON-05, CON-10 | No | Alternative multi-location checks |

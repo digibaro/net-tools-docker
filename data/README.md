@@ -18,3 +18,14 @@ Without an ASN database the network is looked up through Team Cymru's DNS servic
 
 Replacing a file is picked up within 30 seconds, without a restart. A path set explicitly
 through `GEOIP_*_DB` that does not exist makes `/api/readyz` fail.
+
+## Status feeds and quick links (DASH-01, DASH-02)
+
+| File | Tool | Override | Example |
+|---|---|---|---|
+| `status-feeds.yml` | Cloud service status | `STATUS_FEEDS_FILE` | [status-feeds.example.yml](status-feeds.example.yml) |
+| `links.yml` | Quick links | `LINKS_FILE` | [links.example.yml](links.example.yml) |
+
+Without a file the built-in lists are used. The files are read when the api container starts
+(`docker compose restart api` after a change). A file that cannot be parsed is ignored: the tool
+shows the built-in list with a warning, and the api log says what is wrong.

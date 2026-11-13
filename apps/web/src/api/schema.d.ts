@@ -599,6 +599,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/status/cloud": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current state of cloud services from their public status feeds */
+        get: operations["cloudStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin-maintained quick links (LINKS_FILE) */
+        get: operations["quickLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/asn/lookup": {
         parameters: {
             query?: never;
@@ -2450,6 +2484,43 @@ export interface components {
                 found: string[];
                 /** @enum {string} */
                 status: "pass" | "warn" | "fail" | "info";
+            }[];
+        };
+        CloudStatus: {
+            /** Format: date-time */
+            checkedAt: string;
+            configError: string;
+            services: {
+                id: string;
+                name: string;
+                group: string;
+                /** @enum {string} */
+                kind: "statuspage" | "google" | "aws" | "rss" | "m365consumer" | "slack" | "link";
+                page: string;
+                /** @enum {string} */
+                state: "operational" | "maintenance" | "degraded" | "outage" | "unknown" | "link";
+                error: string;
+                components: string[];
+                incidents: {
+                    title: string;
+                    /** @enum {string} */
+                    impact: "outage" | "degraded" | "maintenance" | "info";
+                    status: string;
+                    started: string;
+                    updated: string;
+                    url: string;
+                }[];
+            }[];
+        };
+        QuickLinks: {
+            /** @description false while the built-in examples are shown */
+            custom: boolean;
+            configError: string;
+            links: {
+                name: string;
+                url: string;
+                description: string;
+                group: string;
             }[];
         };
         AsnOrigin: {
@@ -4742,6 +4813,52 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OkEnvelope"] & {
                         data: components["schemas"]["EmailM365"];
+                    };
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    cloudStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkEnvelope"] & {
+                        data: components["schemas"]["CloudStatus"];
+                    };
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    quickLinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkEnvelope"] & {
+                        data: components["schemas"]["QuickLinks"];
                     };
                 };
             };

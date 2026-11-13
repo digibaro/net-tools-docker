@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Azure Status</title>
+    <link>https://azure.status.microsoft/en-us/status/</link>
+    <item>
+      <title>Mitigated - Storage availability in West Europe</title>
+      <link>https://azure.status.microsoft/en-us/status/history/?trackingid=ABCD-123</link>
+      <description>Summary of impact: …</description>
+      <pubDate>Fri, 13 Nov 2026 09:30:00 Z</pubDate>
+    </item>
+  </channel>
+</rss>

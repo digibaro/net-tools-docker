@@ -32,6 +32,7 @@ var Known = []struct {
 	{"PeeringDB", "PEERINGDB_KEY", true},
 	{"RIPEstat", "", false},
 	{"Shodan InternetDB", "", false},
+	{"Status feeds", "", false},
 	{"Tor Project", "", false},
 	{"urlscan.io", "URLSCAN_KEY", false},
 	{"VirusTotal", "VIRUSTOTAL_KEY", false},

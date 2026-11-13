@@ -4,3 +4,4 @@
 node_modules/
 /data/*
 !/data/README.md
+!/data/*.example.yml
